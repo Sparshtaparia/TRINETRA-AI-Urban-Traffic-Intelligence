@@ -128,9 +128,9 @@ async def get_ai_summary():
 
     base_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
     env_path = os.path.join(base_dir, ".env")
-    load_dotenv(dotenv_path=env_path)
+    load_dotenv(dotenv_path=env_path, override=True)
     
-    keys = [os.getenv(k) for k in ["Gemini_API", "GEMINI_API_KEY_1", "GEMINI_API_KEY_2", "GEMINI_API_KEY_3"] if os.getenv(k)]
+    keys = list(dict.fromkeys([os.getenv(k) for k in ["Gemini_API", "GEMINI_API_KEY_1", "GEMINI_API_KEY_2", "GEMINI_API_KEY_3"] if os.getenv(k)]))
     if not keys:
         return {"status": "failed", "error": "No Gemini API keys found in environment"}
 
@@ -239,9 +239,9 @@ async def ask_trinetra(req: ChatRequest):
 
     base_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
     env_path = os.path.join(base_dir, ".env")
-    load_dotenv(dotenv_path=env_path)
+    load_dotenv(dotenv_path=env_path, override=True)
     
-    keys = [os.getenv(k) for k in ["Gemini_API", "GEMINI_API_KEY_1", "GEMINI_API_KEY_2", "GEMINI_API_KEY_3"] if os.getenv(k)]
+    keys = list(dict.fromkeys([os.getenv(k) for k in ["Gemini_API", "GEMINI_API_KEY_1", "GEMINI_API_KEY_2", "GEMINI_API_KEY_3"] if os.getenv(k)]))
     if not keys:
         return {"status": "failed", "error": "No Gemini API keys found in environment"}
 
