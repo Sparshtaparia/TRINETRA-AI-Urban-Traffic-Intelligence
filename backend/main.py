@@ -1,18 +1,33 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import JSONResponse
 import os
 from app.api import endpoints, live_endpoints
 
 app = FastAPI(title="TRINETRA-P API")
 
+# CORS must be the FIRST middleware registered
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=True,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Explicit OPTIONS handler so Vercel doesn't swallow the preflight
+@app.options("/{full_path:path}")
+async def options_handler(full_path: str):
+    return JSONResponse(
+        content={},
+        status_code=200,
+        headers={
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type, Authorization",
+        }
+    )
 
 app.include_router(endpoints.router, prefix="/api")
 app.include_router(live_endpoints.router, prefix="/api/live")
