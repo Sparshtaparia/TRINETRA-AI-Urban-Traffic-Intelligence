@@ -33,10 +33,18 @@ def compute_picq_delta():
 
 
 def normalize_row(row: pd.Series, mapping: dict, source_type: str) -> dict:
-    timestamp = str(row.get(mapping.get("timestamp"), 
-datetime.now(timezone.utc).isoformat()))
-    lat = float(row.get(mapping.get("latitude"), None) or 0)
-    lon = float(row.get(mapping.get("longitude"), None) or 0)
+    ts_col = mapping.get("timestamp")
+    timestamp = str(row.get(ts_col) if ts_col else datetime.now(timezone.utc).isoformat())
+
+    try:
+        lat = float(row.get(mapping.get("latitude"), 0) or 0)
+    except (ValueError, TypeError):
+        lat = 0
+
+    try:
+        lon = float(row.get(mapping.get("longitude"), 0) or 0)
+    except (ValueError, TypeError):
+        lon = 0
 
     if lat == 0 and lon == 0:
         lat = 12.9716
