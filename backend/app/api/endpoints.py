@@ -32,6 +32,8 @@ class UrlPayload(BaseModel):
 
 @router.post("/static/upload-dataset-url")
 def upload_dataset_url(payload: UrlPayload):
+    if os.getenv("VERCEL") == "1":
+        return {"status": "success", "message": f"Demo Mode (Vercel): URL processing simulated. Pre-computed dataset will be shown."}
     from app.services.url_downloader import download_from_url
     try:
         contents, ext = download_from_url(payload.url)

@@ -136,6 +136,15 @@ class UrlPayload(BaseModel):
 
 @router.post("/upload-csv-source-url")
 def upload_csv_source_url(payload: UrlPayload):
+    if os.getenv("VERCEL") == "1":
+        return {
+            "status": "uploaded",
+            "source_type": "csv_replay",
+            "file_id": "demo_stream.csv",
+            "file_name": "simulated_dataset.parquet",
+            "file_size_mb": 20.0,
+            "message": "Demo Mode (Vercel): URL processing simulated."
+        }
     from app.services.url_downloader import download_from_url
     try:
         contents, ext = download_from_url(payload.url)
