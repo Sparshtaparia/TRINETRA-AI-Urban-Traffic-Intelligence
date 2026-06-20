@@ -1,11 +1,11 @@
 {
-  "raw_parking_records": 298445,
+  "raw_parking_records": 298450,
   "analyzed_segments": 7814,
   "avg_records_per_segment": 38.19,
-  "average_picq": 10.054099597556183,
+  "average_picq": 10.054094799632246,
   "median_picq": 6.610707757454523,
   "peak_picq": 100.0,
-  "average_rre": 6.181759674140001,
+  "average_rre": 6.181756592443007,
   "median_rre": 2.97771912205547,
   "peak_rre": 100.0,
   "critical_rre_zones": 5,
@@ -22,6 +22,6 @@
   "high_impact_count": 3127,
   "violation_threshold": 8.0,
   "impact_threshold": 8.56104931764462,
-  "average_data_confidence": 77.53662441301066,
+  "average_data_confidence": 77.53661360338232,
   "top_enforcement_segment": "GRID-12964-77577"
 }
