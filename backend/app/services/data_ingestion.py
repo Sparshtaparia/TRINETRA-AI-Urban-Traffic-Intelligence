@@ -55,7 +55,7 @@ def process_flipkart_dataset() -> dict:
 def process_uploaded_file(contents: bytes, filename: str) -> dict:
     try:
         if filename.endswith(".parquet"):
-            df = pd.read_parquet(io.BytesIO(contents), engine='fastparquet')
+            df = pd.read_parquet(io.BytesIO(contents), engine='pyarrow')
         elif filename.endswith(".csv.gz"):
             df = pd.read_csv(io.BytesIO(contents), compression='gzip', low_memory=False)
         elif filename.endswith(".csv"):
