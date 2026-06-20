@@ -34,6 +34,7 @@ export function AskTrinetraTab() {
   const [query, setQuery] = useState("");
   const [messages, setMessages] = useState<Message[]>(loadHistory);
   const [loading, setLoading] = useState(false);
+  const [cooldown, setCooldown] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -54,7 +55,11 @@ export function AskTrinetraTab() {
   }, [messages, loading]);
 
   const handleSend = async () => {
-    if (!query.trim() || loading) return;
+    if (!query.trim() || loading || cooldown) return;
+
+    // Rate Limiter
+    setCooldown(true);
+    setTimeout(() => setCooldown(false), 5000); // 5 sec cooldown
 
     const userMsg = query;
     setMessages(prev => [...prev, { role: "user", content: userMsg }]);
@@ -163,8 +168,12 @@ export function AskTrinetraTab() {
               placeholder="Ask about Q2 zones, PICQ scores, or enforcement strategy..."
               className="bg-neutral-900 border-neutral-800 text-white focus-visible:ring-[#39FF14]/50 placeholder:text-neutral-600"
             />
-            <Button onClick={handleSend} disabled={!query.trim() || loading} className="bg-[#39FF14] text-black hover:bg-[#39FF14]/80 shrink-0 h-10 w-10 p-0" title="Send">
-              <Send className="w-4 h-4" />
+            <Button
+              onClick={handleSend}
+              disabled={!query.trim() || loading || cooldown}
+              className="bg-[#39FF14] text-black hover:bg-[#39FF14]/80 px-6 font-bold tracking-wide"
+            >
+              {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : cooldown ? <span className="text-xs">Wait...</span> : <Send className="w-5 h-5" />}
             </Button>
           </div>
           {messages.length <= 1 && (

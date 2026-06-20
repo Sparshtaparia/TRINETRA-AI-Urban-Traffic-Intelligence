@@ -28,8 +28,10 @@ export function LiveAskTrinetraTab() {
       if (stored) return JSON.parse(stored);
     } catch {}
     return [];
+    return [{ role: "assistant", content: "I am **TRINETRA AI (Live Mode)**. I am monitoring the active event stream. How can I assist with the current enforcement?" }];
   });
   const [loading, setLoading] = useState(false);
+  const [cooldown, setCooldown] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const { snapshot } = useLiveSession();
 
@@ -44,7 +46,9 @@ export function LiveAskTrinetraTab() {
 
   const handleClear = () => {
     sessionStorage.removeItem(STORAGE_KEY);
-    setMessages([]);
+    setMessages([
+      { role: "assistant", content: "I am **TRINETRA AI (Live Mode)**. I am monitoring the active event stream. How can I assist with the current enforcement?" }
+    ]);
   };
 
   useEffect(() => {
@@ -52,7 +56,11 @@ export function LiveAskTrinetraTab() {
   }, [messages, loading]);
 
   const handleSend = async () => {
-    if (!query.trim() || loading) return;
+    if (!query.trim() || loading || cooldown) return;
+
+    // Rate limiter
+    setCooldown(true);
+    setTimeout(() => setCooldown(false), 5000); // 5 sec cooldown
 
     const userMsg = query;
     setMessages(prev => [...prev, { role: "user", content: userMsg }]);
@@ -175,8 +183,12 @@ export function LiveAskTrinetraTab() {
               placeholder="Ask about the live stream..."
               className="bg-neutral-900 border-neutral-800 text-white focus-visible:ring-[#39FF14]/50 placeholder:text-neutral-600"
             />
-            <Button onClick={handleSend} disabled={!query.trim() || loading} className="bg-[#39FF14] text-black hover:bg-[#39FF14]/80 shrink-0 h-10 w-10 p-0" title="Send">
-              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+            <Button
+              onClick={handleSend}
+              disabled={!query.trim() || loading || cooldown}
+              className="bg-orange-500 text-white hover:bg-orange-600 px-6 font-bold tracking-wide"
+            >
+              {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : cooldown ? <span className="text-xs">Wait...</span> : <Send className="w-5 h-5" />}
             </Button>
           </div>
           {messages.length <= 1 && (

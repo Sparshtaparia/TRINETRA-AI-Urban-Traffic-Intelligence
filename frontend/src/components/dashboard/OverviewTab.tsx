@@ -86,9 +86,16 @@ export function OverviewTab() {
     }
   }, [pipelineStatus, visibleStepIndex, isAnimating]);
 
+  const [cooldown, setCooldown] = useState(false);
+
   // Fetch AI analysis manually
   const handleRunAI = () => {
-    if (aiLoading || aiAnalysis) return;
+    if (aiLoading || aiAnalysis || cooldown) return;
+    
+    // Rate Limiter
+    setCooldown(true);
+    setTimeout(() => setCooldown(false), 15000); // 15 seconds cooldown
+
     setAiLoading(true);
     fetch(API_BASE + "/api/analytics/ai-summary")
       .then(res => res.json())
@@ -281,10 +288,11 @@ export function OverviewTab() {
             <div className="ml-auto flex flex-col items-end gap-1">
               <button
                 onClick={handleRunAI}
-                className="flex items-center gap-2 text-xs font-semibold bg-[#39FF14]/10 hover:bg-[#39FF14]/20 text-[#39FF14] border border-[#39FF14]/30 px-3 py-1.5 rounded-lg transition-colors"
+                disabled={aiLoading || aiAnalysis || cooldown}
+                className="flex items-center gap-2 text-xs font-semibold bg-[#39FF14]/10 hover:bg-[#39FF14]/20 text-[#39FF14] border border-[#39FF14]/30 px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Sparkles className="w-3.5 h-3.5" />
-                Run AI Analysis
+                {cooldown ? "Wait 15s..." : "Run AI Analysis"}
               </button>
               <span className="text-[10px] text-neutral-500">Saves API tokens by running on-demand</span>
             </div>

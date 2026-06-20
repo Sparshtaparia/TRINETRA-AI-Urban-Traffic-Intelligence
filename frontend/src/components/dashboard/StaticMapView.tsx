@@ -25,7 +25,7 @@ interface SegmentEvent {
   recommended_action: string;
 }
 
-export function StaticMapView() {
+export function StaticMapView({ isActive = true }: { isActive?: boolean }) {
   const [mapState, setMapState] = useState<MapState>("loading");
   const [mapError, setMapError] = useState<string | null>(null);
   const [segments, setSegments] = useState<SegmentEvent[]>([]);
@@ -127,9 +127,23 @@ export function StaticMapView() {
     document.head.appendChild(script);
 
     return () => {
-      window.clearTimeout(timeout);
+      return () => clearTimeout(timeout);
     };
-  }, [mapSdkKey, segments]);
+  }, [mapSdkKey]);
+
+  // Handle resize when tab becomes active
+  useEffect(() => {
+    if (isActive && mapRef.current) {
+      setTimeout(() => {
+        try {
+          if (typeof mapRef.current.resize === 'function') {
+            mapRef.current.resize();
+          }
+          window.dispatchEvent(new Event('resize'));
+        } catch (e) {}
+      }, 100);
+    }
+  }, [isActive, segments]);
 
   useEffect(() => {
     const fetchMapEvents = async () => {

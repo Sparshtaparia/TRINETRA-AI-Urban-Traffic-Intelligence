@@ -29,16 +29,30 @@ interface CoordEvent {
   timestamp: string;
 }
 
-export function LiveMapView() {
+export function LiveMapView({ isActive = true }: { isActive?: boolean }) {
+  const { connected, paused, events: coordEvents, clearEvents } = useLiveSession();
+  
   const [mapState, setMapState] = useState<MapState>("loading");
   const [mapError, setMapError] = useState<string | null>(null);
-  const [coordEvents, setCoordEvents] = useState<CoordEvent[]>([]);
   const [mapSdkLoaded, setMapSdkLoaded] = useState(false);
-  const { connected, paused } = useLiveSession();
 
   const mapRef = useRef<any>(null);
   const markersRef = useRef<any[]>([]);
   const isInitializing = useRef(false);
+
+  // Handle map resize when tab becomes active
+  useEffect(() => {
+    if (isActive && mapRef.current) {
+      setTimeout(() => {
+        try {
+          if (typeof mapRef.current.resize === 'function') {
+            mapRef.current.resize();
+          }
+          window.dispatchEvent(new Event('resize'));
+        } catch (e) {}
+      }, 100);
+    }
+  }, [isActive]);
 
   // Check for MapMyIndia SDK key
   const mapSdkKey = process.env.NEXT_PUBLIC_MAPMYINDIA_MAP_SDK_KEY || null;
