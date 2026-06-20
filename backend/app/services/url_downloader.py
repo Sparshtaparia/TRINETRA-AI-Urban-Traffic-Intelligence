@@ -32,9 +32,10 @@ def guess_extension_from_magic_bytes(header: bytes) -> str:
     if header.startswith(b'PK\x03\x04'):
         return '.xlsx'
     
-    # Check for common zip headers if people zip their csv
     if header.startswith(b'PK'):
         return '.zip'
+    if header.startswith(b'\x1f\x8b'):
+        return '.csv.gz'
         
     return '.csv'
 
