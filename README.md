@@ -155,6 +155,20 @@ TRINETRA-P: Parking-Induced Congestion Intelligence Platform
 
 ---
 
+## Enterprise SaaS Architecture (Beyond Serverless MVP)
+
+The current MVP is designed for rapid deployment on Vercel Serverless Functions. However, Vercel Functions are stateless, meaning background tasks and large 100MB+ file processing cannot be handled efficiently without hitting read-only filesystem restrictions or memory timeouts.
+
+For a true Enterprise SaaS production environment, TRINETRA-P shifts to a distributed Event-Driven Architecture:
+
+1. **Object Storage (AWS S3 / GCP Cloud Storage):** Instead of uploading large CSVs to the backend server directly, the frontend uploads securely to S3 via pre-signed URLs. This bypasses Vercel's API payload limits entirely.
+2. **Event-Driven Processing (Apache Kafka / AWS SQS):** Once the file hits S3, an event is triggered to a message queue. This completely decouples the upload process from the heavy data analysis.
+3. **Asynchronous Worker Nodes (Celery + AWS ECS / EKS):** Dedicated, long-running Python worker containers pull tasks from the queue, download the CSV from S3, run the heavy PICQ Pandas/Scikit-learn pipeline, and update a progress state via WebSocket.
+4. **Persistent Database (PostgreSQL / TimescaleDB):** Instead of caching results in `.json` or `.csv` files on disk, the analyzed segment scores, Hidden Impact Zones, and analytics are stored in a relational database optimized for geospatial and time-series queries.
+5. **Live Stream Engine (True WebSockets):** For real-time operations, CCTV IoT devices or YOLO edge servers stream parking violations directly into a Kafka topic. The backend consumes this stream and pushes updates to the React dashboard via true WebSockets, completely replacing the 2-second HTTP polling mechanism.
+
+---
+
 ## Tech Stack
 
 | Layer | Technology |
