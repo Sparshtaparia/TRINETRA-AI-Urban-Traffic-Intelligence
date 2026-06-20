@@ -129,7 +129,7 @@ function LiveDashboardInner() {
             <TabsContent value="live-command" className="mt-0 border-0 p-0 flex flex-col flex-1 overflow-y-auto min-h-0">
               <LiveCommandCenterTab />
             </TabsContent>
-            <TabsContent value="live-map" className="mt-0 border-0 p-0 flex flex-col flex-1 h-full min-h-0 data-[state=active]:flex">
+            <TabsContent value="live-map" forceMount className={`mt-0 border-0 p-0 flex-col flex-1 h-full min-h-0 data-[state=active]:flex ${activeTab === "live-map" ? "flex" : "hidden"}`}>
               <LiveMapView isActive={activeTab === "live-map"} />
             </TabsContent>
             <TabsContent value="active-violations" className="mt-0 border-0 p-0 flex flex-col flex-1 overflow-y-auto min-h-0">

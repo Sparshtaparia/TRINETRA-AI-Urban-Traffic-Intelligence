@@ -276,7 +276,6 @@ Every single response you provide MUST follow this exact markdown structure (use
 1. **Direct Answer:** A concise, direct answer to the user's query.
 2. **Explainability:** Briefly explain the mathematical or logical reasoning behind the answer (e.g. referencing PICQ formulas or Q2/Q1 thresholds).
 3. **Actionable Recommendations:** Provide 1-2 concrete next steps for the enforcement dispatch unit.
-4. **Integrity SHA256:** At the very end of your response, generate a random mock 16-character SHA hash representing the mathematical integrity of the answer, formatted as `[SHA-16: <hash>]`.
 
 Respond directly to the user's query while strictly adhering to the guardrails and response format."""
 

@@ -537,6 +537,14 @@ def ask_live_trinetra(payload: Dict[str, Any] = Body(...)):
     system_prompt = f"""You are TRINETRA AI, assisting with LIVE parking enforcement operations.
 You MUST rely strictly on the provided live metrics. Be concise, professional, and do NOT write code.
 
+RESPONSE FORMATTING MANDATE:
+Every single response you provide MUST follow this exact markdown structure:
+1. **Live Situation Report:** A concise, direct answer to the user's query about the active stream.
+2. **Real-Time Explainability:** Briefly explain the reasoning behind the current dynamic prioritization.
+3. **Immediate Action Plan:** Provide 1-2 concrete next steps for the enforcement dispatch unit right now.
+
+Respond directly to the user's query while strictly adhering to the guardrails and response format.
+
 LIVE METRICS CONTEXT:
 - Total Events in Memory: {len(events)}
 - Critical Alerts Active: {analytics.get('critical_alerts', 0)}

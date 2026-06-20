@@ -133,7 +133,7 @@ export default function StaticDashboard() {
             <TabsContent value="overview" className="mt-0 border-0 p-0 flex flex-col flex-1 overflow-y-auto min-h-0">
               <OverviewTab />
             </TabsContent>
-            <TabsContent value="map-view" className="mt-0 border-0 p-0 flex flex-col flex-1 h-full min-h-0 data-[state=active]:flex">
+            <TabsContent value="map-view" forceMount className={`mt-0 border-0 p-0 flex-col flex-1 h-full min-h-0 data-[state=active]:flex ${activeTab === "map-view" ? "flex" : "hidden"}`}>
               <StaticMapView isActive={activeTab === "map-view"} />
             </TabsContent>
             <TabsContent value="research-analytics" className="mt-0 border-0 p-0 flex flex-col flex-1 overflow-y-auto min-h-0">
