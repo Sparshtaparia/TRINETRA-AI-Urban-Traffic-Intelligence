@@ -10,7 +10,10 @@ if RESEARCH_DIR not in sys.path:
 
 import TRINETRA_PICQ_Research_Model
 
-PROCESSED_DIR = os.path.join(os.path.dirname(__file__), "../../processed")
+if os.getenv("VERCEL") == "1":
+    PROCESSED_DIR = "/tmp/processed"
+else:
+    PROCESSED_DIR = os.path.join(os.path.dirname(__file__), "../../processed")
 DATA_DIR = os.path.join(os.path.dirname(__file__), "../../../data")
 os.makedirs(PROCESSED_DIR, exist_ok=True)
 

@@ -1,11 +1,11 @@
 {
-  "raw_rows": 298450,
-  "cleaned_rows": 298450,
+  "raw_rows": 298445,
+  "cleaned_rows": 298445,
   "rows_removed_total": 0,
   "duplicate_rows_removed": 0,
   "unique_segments": 7814,
   "segment_creation_method": "grid_cell_precision_3",
-  "valid_coordinate_rows": 298450,
+  "valid_coordinate_rows": 298445,
   "valid_coordinate_rate": 1.0,
   "missing_timestamp_rate": 0.0,
   "average_record_quality_score": 100.0

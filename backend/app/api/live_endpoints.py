@@ -106,6 +106,15 @@ def normalize_row(row: pd.Series, mapping: dict, source_type: str) -> dict:
 @router.post("/upload-csv-source")
 async def upload_csv_source(file: UploadFile = File(...)):
     contents = await file.read()
+    if os.getenv("VERCEL") == "1":
+        return {
+            "status": "uploaded",
+            "source_type": "csv_replay",
+            "file_id": "demo_stream.csv",
+            "file_name": file.filename,
+            "file_size_mb": 0.1,
+            "message": "Demo Mode (Vercel): Simulated upload."
+        }
     file_id = f"live_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{file.filename}"
     file_path = os.path.join(UPLOADS_DIR, file_id)
 
@@ -128,7 +137,11 @@ def validate_csv_source(payload: Dict[str, Any] = Body(...)):
     if not file_id:
         return {"status": "error", "message": "file_id required"}
 
-    file_path = os.path.join(UPLOADS_DIR, file_id)
+    if os.getenv("VERCEL") == "1" and file_id == "demo_stream.csv":
+        file_path = os.path.join(os.path.dirname(__file__), "../../../demo_stream.csv")
+    else:
+        file_path = os.path.join(UPLOADS_DIR, file_id)
+
     if not os.path.exists(file_path):
         return {"status": "error", "message": "File not found"}
 
@@ -172,7 +185,11 @@ def start_csv_replay(payload: Dict[str, Any] = Body(...)):
     events_per_tick = payload.get("events_per_tick", 3)
     mapping = payload.get("mapping", {})
 
-    file_path = os.path.join(UPLOADS_DIR, file_id)
+    if os.getenv("VERCEL") == "1" and file_id == "demo_stream.csv":
+        file_path = os.path.join(os.path.dirname(__file__), "../../../demo_stream.csv")
+    else:
+        file_path = os.path.join(UPLOADS_DIR, file_id)
+
     if not os.path.exists(file_path):
         return {"status": "error", "message": "File not found"}
 
@@ -231,7 +248,9 @@ def start_file_polling(payload: Dict[str, Any] = Body(...)):
     poll_interval = payload.get("poll_interval", 3)
     mapping = payload.get("mapping", {})
 
-    if not os.path.isabs(file_path):
+    if os.getenv("VERCEL") == "1":
+        file_path = os.path.join(os.path.dirname(__file__), "../../../demo_stream.csv")
+    elif not os.path.isabs(file_path):
         file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), file_path)
 
     if not os.path.exists(file_path):

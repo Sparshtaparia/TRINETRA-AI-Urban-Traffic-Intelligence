@@ -14,11 +14,15 @@ def health_check():
 
 @router.post("/static/use-flipkart-dataset")
 def use_flipkart_dataset():
+    if os.getenv("VERCEL") == "1":
+        return {"status": "success", "message": "Demo Mode (Vercel): Pre-computed dataset is active. Filesystem is read-only."}
     result = process_flipkart_dataset()
     return result
 
 @router.post("/static/upload-dataset")
 async def upload_dataset(file: UploadFile = File(...)):
+    if os.getenv("VERCEL") == "1":
+        return {"status": "success", "message": f"Demo Mode (Vercel): Upload simulated for {file.filename}. Pre-computed dataset will be shown."}
     contents = await file.read()
     result = process_uploaded_file(contents, file.filename)
     return result

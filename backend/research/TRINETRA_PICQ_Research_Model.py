@@ -13,7 +13,10 @@ import seaborn as sns
 
 # Make sure OUTPUT_DIR points to backend/processed correctly, resolving absolutely from this file's location
 base_dir = Path(__file__).resolve().parent.parent
-OUTPUT_DIR = base_dir / "processed"
+if os.getenv("VERCEL") == "1":
+    OUTPUT_DIR = Path("/tmp/processed")
+else:
+    OUTPUT_DIR = base_dir / "processed"
 FIGURE_DIR = OUTPUT_DIR / "figures"
 
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
