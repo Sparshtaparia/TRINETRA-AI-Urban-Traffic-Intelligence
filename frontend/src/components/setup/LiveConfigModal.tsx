@@ -76,6 +76,51 @@ export function LiveConfigModal({ open, onOpenChange }: { open: boolean; onOpenC
     }
   };
 
+  const [url, setUrl] = useState("");
+
+  const handleUrlUpload = async () => {
+    if (!url) return;
+    setFile(null);
+    setFilePath("");
+    
+    setIsProcessing(true);
+    setSchemaStatus("validating");
+    try {
+      const uploadRes = await fetch(API_BASE + "/api/live/upload-csv-source-url", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url })
+      });
+      const uploadData = await uploadRes.json();
+      
+      if (uploadData.status === "uploaded") {
+        setFileId(uploadData.file_id);
+        
+        const valRes = await fetch(API_BASE + "/api/live/validate-csv-source", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ file_id: uploadData.file_id })
+        });
+        const valData = await valRes.json();
+        if (valData.status === "ready") {
+          setMapping(valData.detected_mapping);
+          setSchemaStatus("ready");
+        } else {
+          alert("Schema validation failed: " + valData.message);
+          setSchemaStatus("pending");
+        }
+      } else {
+        alert("URL processing failed: " + uploadData.message);
+        setSchemaStatus("pending");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Failed to fetch from URL and validate.");
+      setSchemaStatus("pending");
+    }
+    setIsProcessing(false);
+  };
+
   const startReplay = async () => {
     setIsProcessing(true);
     try {
@@ -201,25 +246,40 @@ export function LiveConfigModal({ open, onOpenChange }: { open: boolean; onOpenC
             </div>
             
             <div className="p-4 border border-neutral-800 rounded-lg bg-neutral-950 space-y-4">
-              <div className="flex items-center gap-4">
+              <div className="flex flex-col gap-3 flex-shrink-0">
+              <input
+                type="text"
+                placeholder="Paste direct URL here (e.g. Google Drive)"
+                className="w-full bg-neutral-900 border border-neutral-800 rounded-md px-3 py-2 text-sm text-white focus:outline-none focus:border-neutral-600"
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+              />
+              <div className="flex gap-2">
+                <Button 
+                  className="flex-1 bg-neutral-800 hover:bg-neutral-700 text-white font-medium"
+                  onClick={handleUrlUpload}
+                  disabled={!url}
+                >
+                  Load URL
+                </Button>
                 <Button 
                   variant="outline" 
-                  className="bg-neutral-900 border-neutral-700 hover:bg-neutral-800"
+                  className="flex-1 bg-transparent border-neutral-800 text-neutral-300 hover:text-white"
                   onClick={() => fileInputRef.current?.click()}
-                  disabled={isProcessing}
                 >
-                  <UploadCloud className="w-4 h-4 mr-2" />
-                  {file ? "Change File" : "Select File"}
+                  Upload File
                 </Button>
-                <input 
-                  type="file" 
-                  ref={fileInputRef} 
-                  className="hidden" 
-                  accept=".csv,.xlsx,.xls"
-                  onChange={handleFileUpload} 
-                />
-                {file && <span className="text-sm text-neutral-300">{file.name}</span>}
               </div>
+              <input 
+                type="file" 
+                ref={fileInputRef} 
+                className="hidden" 
+                accept=".csv,.xlsx,.xls,.parquet" 
+                onChange={handleFileUpload} 
+              />
+            </div>
+            {file && <span className="text-sm text-neutral-300">{file.name}</span>}
+          </div>
               
               {schemaStatus === "validating" && <div className="text-sm text-yellow-400 animate-pulse">Validating Live Schema...</div>}
               {schemaStatus === "ready" && (

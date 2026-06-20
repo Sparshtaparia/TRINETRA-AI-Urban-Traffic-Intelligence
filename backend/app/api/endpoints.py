@@ -27,6 +27,20 @@ async def upload_dataset(file: UploadFile = File(...)):
     result = process_uploaded_file(contents, file.filename)
     return result
 
+class UrlPayload(BaseModel):
+    url: str
+
+@router.post("/static/upload-dataset-url")
+def upload_dataset_url(payload: UrlPayload):
+    from app.services.url_downloader import download_from_url
+    try:
+        contents, ext = download_from_url(payload.url)
+        filename = f"downloaded_dataset{ext}"
+        result = process_uploaded_file(contents, filename)
+        return result
+    except Exception as e:
+        return {"status": "failed", "error": f"Failed to download or process URL: {str(e)}"}
+
 import json
 
 def load_json_artifact(filename: str):

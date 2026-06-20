@@ -60,6 +60,54 @@ export function HistoricalConfigModal({ open, onOpenChange }: { open: boolean; o
     }
   };
 
+  const [url, setUrl] = useState("");
+
+  const handleUrlUpload = async () => {
+    if (!url) return;
+    setIsProcessing(true);
+    setStatusText("Downloading dataset from URL...");
+
+    const statuses = [
+      "Downloading dataset from URL...",
+      "Detecting file format and reading data...",
+      "Normalizing geo-coordinates...",
+      "Mapping vehicle and violation types...",
+      "Computing baseline severity scores...",
+      "Detecting anomalies in timestamp distributions...",
+      "Preparing TRINETRA-P core pipeline..."
+    ];
+    let sIdx = 0;
+    const interval = setInterval(() => {
+      setStatusText(statuses[sIdx % statuses.length]);
+      sIdx++;
+    }, 2000);
+
+    try {
+      const res = await fetch(API_BASE + "/api/static/upload-dataset-url", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url }),
+      });
+      clearInterval(interval);
+      const data = await res.json();
+      if (data.status === "success") {
+        setStatusText("Dataset processed. Opening Dashboard...");
+        setTimeout(() => {
+          router.push("/dashboard/static");
+        }, 1200);
+      } else {
+        alert("Failed to process dataset: " + data.error);
+        setIsProcessing(false);
+        setStatusText("");
+      }
+    } catch (err) {
+      clearInterval(interval);
+      alert("Network error. Ensure backend is running.");
+      setIsProcessing(false);
+      setStatusText("");
+    }
+  };
+
   const handleLoadPrecomputed = () => {
     setIsProcessing(true);
     setStatusText("Loading precomputed TRINETRA-P artifacts...");
@@ -117,28 +165,48 @@ export function HistoricalConfigModal({ open, onOpenChange }: { open: boolean; o
                 <Upload className="w-5 h-5 text-[#39FF14]" />
               </div>
               <div className="flex-1">
-                <h3 className="font-semibold text-base text-white mb-1">Upload CSV / Excel File</h3>
+                <h3 className="font-semibold text-base text-white mb-1">Load Dataset (Upload or URL)</h3>
                 <p className="text-sm text-neutral-400 leading-relaxed">
-                  Upload your own parking violation dataset. Columns are auto-detected and mapped to the TRINETRA schema.
+                  Upload a file or provide a direct link (e.g. Google Drive, Dropbox, GitHub). Auto-detects schema.
                 </p>
               </div>
               <p className="text-xs text-neutral-600 font-mono">
-                Accepts .csv · .xlsx · .xls
+                Accepts .csv · .parquet · .xlsx
               </p>
-              {/* Hidden real file input, button triggers it */}
+              
+              <div className="flex flex-col gap-2">
+                <input
+                  type="text"
+                  placeholder="Paste direct URL here..."
+                  className="w-full bg-neutral-900 border border-neutral-800 rounded-md px-3 py-2 text-sm text-white focus:outline-none focus:border-neutral-600"
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
+                />
+                <div className="flex gap-2">
+                  <Button
+                    className="flex-1 bg-neutral-800 hover:bg-neutral-700 text-white font-medium"
+                    onClick={handleUrlUpload}
+                    disabled={!url}
+                  >
+                    Load URL
+                  </Button>
+                  <Button
+                    className="flex-1 bg-neutral-100 text-neutral-900 hover:bg-white font-medium"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    Select File
+                  </Button>
+                </div>
+              </div>
+
+              {/* Hidden real file input */}
               <input
                 ref={fileInputRef}
                 type="file"
                 className="hidden"
-                accept=".csv,.xlsx,.xls"
+                accept=".csv,.xlsx,.xls,.parquet"
                 onChange={handleFileUpload}
               />
-              <Button
-                className="w-full bg-neutral-100 text-neutral-900 hover:bg-white font-medium"
-                onClick={() => fileInputRef.current?.click()}
-              >
-                Select File
-              </Button>
             </div>
           </div>
         )}

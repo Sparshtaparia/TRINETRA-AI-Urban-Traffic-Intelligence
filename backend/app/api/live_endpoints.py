@@ -130,6 +130,31 @@ async def upload_csv_source(file: UploadFile = File(...)):
         "message": "File uploaded. Validate schema before starting replay."
     }
 
+class UrlPayload(BaseModel):
+    url: str
+
+@router.post("/upload-csv-source-url")
+def upload_csv_source_url(payload: UrlPayload):
+    from app.services.url_downloader import download_from_url
+    try:
+        contents, ext = download_from_url(payload.url)
+        file_id = f"live_{datetime.now().strftime('%Y%m%d_%H%M%S')}_downloaded{ext}"
+        file_path = os.path.join(UPLOADS_DIR, file_id)
+        
+        with open(file_path, "wb") as f:
+            f.write(contents)
+            
+        return {
+            "status": "uploaded",
+            "source_type": "csv_replay",
+            "file_id": file_id,
+            "file_name": f"downloaded_dataset{ext}",
+            "file_size_mb": round(len(contents) / (1024 * 1024), 2),
+            "message": "File downloaded from URL. Validate schema before starting replay."
+        }
+    except Exception as e:
+        return {"status": "error", "message": f"Failed to download URL: {str(e)}"}
+
 
 @router.post("/validate-csv-source")
 def validate_csv_source(payload: Dict[str, Any] = Body(...)):
@@ -146,7 +171,9 @@ def validate_csv_source(payload: Dict[str, Any] = Body(...)):
         return {"status": "error", "message": "File not found"}
 
     try:
-        if file_path.endswith(".csv"):
+        if file_path.endswith(".parquet"):
+            df = pd.read_parquet(file_path, engine='pyarrow').head(5)
+        elif file_path.endswith(".csv"):
             df = pd.read_csv(file_path, nrows=5)
         else:
             df = pd.read_excel(file_path, nrows=5)
@@ -194,7 +221,9 @@ def start_csv_replay(payload: Dict[str, Any] = Body(...)):
         return {"status": "error", "message": "File not found"}
 
     try:
-        if file_path.endswith(".csv"):
+        if file_path.endswith(".parquet"):
+            df = pd.read_parquet(file_path, engine='pyarrow')
+        elif file_path.endswith(".csv"):
             df = pd.read_csv(file_path)
         else:
             df = pd.read_excel(file_path)
@@ -257,7 +286,9 @@ def start_file_polling(payload: Dict[str, Any] = Body(...)):
         return {"status": "error", "message": f"File not found: {file_path}"}
 
     try:
-        if file_path.endswith(".csv"):
+        if file_path.endswith(".parquet"):
+            df = pd.read_parquet(file_path, engine='pyarrow')
+        elif file_path.endswith(".csv"):
             df = pd.read_csv(file_path)
         else:
             df = pd.read_excel(file_path)
