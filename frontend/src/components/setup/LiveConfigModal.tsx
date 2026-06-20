@@ -79,17 +79,32 @@ export function LiveConfigModal({ open, onOpenChange }: { open: boolean; onOpenC
   const startReplay = async () => {
     setIsProcessing(true);
     try {
-      await fetch(API_BASE + "/api/live/start-csv-replay", {
+      // Flatten mapping: backend expects {field: "column_name"} not {field: {column, confidence}}
+      const flatMapping: Record<string, string> = {};
+      for (const [field, val] of Object.entries(mapping)) {
+        if (typeof val === "object" && val !== null && "column" in val) {
+          flatMapping[field] = (val as { column: string }).column;
+        } else {
+          flatMapping[field] = String(val);
+        }
+      }
+
+      const res = await fetch(API_BASE + "/api/live/start-csv-replay", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           file_id: fileId,
           poll_interval: 2,
           events_per_tick: 3,
-          mapping: mapping
+          mapping: flatMapping
         })
       });
-      // Save source type for dashboard
+      const data = await res.json();
+      if (data.status !== "connected") {
+        alert(data.message || "Failed to start replay.");
+        setIsProcessing(false);
+        return;
+      }
       localStorage.setItem("live_source_type", "csv_polling");
       setTimeout(() => {
         router.push("/dashboard/live");

@@ -8,6 +8,8 @@ venv/
 .env
 .env.local
 .env.*.local
+backend/.env
+frontend/.env.local
 *.log
 .DS_Store
 uploads/
@@ -23,3 +25,4 @@ backend/__pycache__/
 *.ipynb_checkpoints
 backend/venv/
 .ipynb_checkpoints/
+
