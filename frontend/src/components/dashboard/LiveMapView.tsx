@@ -30,8 +30,8 @@ interface CoordEvent {
 }
 
 export function LiveMapView({ isActive = true }: { isActive?: boolean }) {
-  const { connected, paused, events: coordEvents, clearEvents } = useLiveSession();
-  
+  const { connected, paused } = useLiveSession();
+  const [coordEvents, setCoordEvents] = useState<CoordEvent[]>([]);
   const [mapState, setMapState] = useState<MapState>("loading");
   const [mapError, setMapError] = useState<string | null>(null);
   const [mapSdkLoaded, setMapSdkLoaded] = useState(false);

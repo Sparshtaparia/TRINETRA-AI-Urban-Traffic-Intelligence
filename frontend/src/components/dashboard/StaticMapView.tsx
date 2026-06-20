@@ -127,7 +127,7 @@ export function StaticMapView({ isActive = true }: { isActive?: boolean }) {
     document.head.appendChild(script);
 
     return () => {
-      return () => clearTimeout(timeout);
+      clearTimeout(timeout);
     };
   }, [mapSdkKey]);
 
