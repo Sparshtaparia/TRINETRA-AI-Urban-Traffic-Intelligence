@@ -97,11 +97,20 @@ Status: PASS ✓
 12 cross-validated checks with PASS/FAIL badges and zero hardcoded values.
 
 ### 7. AI Assistant (Ask TRINETRA)
-
+- Gemini 2.5 Flash B2G enforcement expert
+- Strict guardrails preventing token leakage, code writing, or general knowledge responses
+- SHA256 integrity hash on all mathematical explanations
+- Dual session state: Historical full-data context vs. Live 5-minute sliding window
 - Gemini-powered natural language querying
 - Session-persistent chat history via `sessionStorage`
 - Answers: dispatch recommendations, zone summaries, severity analysis, PICQ explanations
 - Green theme (`#39FF14`) matching the command center aesthetic
+
+### 8. System Architecture & API Optimizations
+- **Gemini API Fallback Mechanism:** Backend implements dynamic fallback routing across multiple Gemini API keys (`GEMINI_API_KEY_1`, `2`, `3`) to ensure high availability and bypass rate limits automatically.
+- **Map SDK Persistence:** Frontend uses advanced DOM management (`display: none` persistence + `ResizeObserver`/dynamic `.resize()` triggers) during tab switching. This ensures the MapMyIndia SDK is only initialized **once** per session, drastically reducing map load costs.
+- **AI Rate Limiting (Token Conservation):** Strategic UI cooldowns (5s for chatbot, 15s for full-dashboard analysis) prevent API spamming and token exhaustion.
+- **On-Demand Computation:** Heavy AI analysis is decoupled from page loads, requiring explicit user triggers to conserve compute resources.
 
 ### 8. Geospatial Intelligence
 
