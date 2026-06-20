@@ -21,7 +21,8 @@ def use_flipkart_dataset():
 
 @router.post("/static/upload-dataset")
 async def upload_dataset(file: UploadFile = File(...)):
-    if os.getenv("VERCEL") == "1":
+    is_vercel = os.getenv("VERCEL") == "1" or os.getenv("VERCEL_ENV") is not None or os.getenv("AWS_REGION") is not None
+    if is_vercel:
         return {"status": "success", "message": f"Demo Mode (Vercel): Upload simulated for {file.filename}. Pre-computed dataset will be shown."}
     contents = await file.read()
     result = process_uploaded_file(contents, file.filename)
@@ -32,7 +33,8 @@ class UrlPayload(BaseModel):
 
 @router.post("/static/upload-dataset-url")
 def upload_dataset_url(payload: UrlPayload):
-    if os.getenv("VERCEL") == "1":
+    is_vercel = os.getenv("VERCEL") == "1" or os.getenv("VERCEL_ENV") is not None or os.getenv("AWS_REGION") is not None
+    if is_vercel:
         return {"status": "success", "message": f"Demo Mode (Vercel): URL processing simulated. Pre-computed dataset will be shown."}
     from app.services.url_downloader import download_from_url
     try:

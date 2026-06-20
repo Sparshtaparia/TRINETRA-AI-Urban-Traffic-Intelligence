@@ -107,7 +107,8 @@ def normalize_row(row: pd.Series, mapping: dict, source_type: str) -> dict:
 @router.post("/upload-csv-source")
 async def upload_csv_source(file: UploadFile = File(...)):
     contents = await file.read()
-    if os.getenv("VERCEL") == "1":
+    is_vercel = os.getenv("VERCEL") == "1" or os.getenv("VERCEL_ENV") is not None or os.getenv("AWS_REGION") is not None
+    if is_vercel:
         return {
             "status": "uploaded",
             "source_type": "csv_replay",
@@ -136,7 +137,8 @@ class UrlPayload(BaseModel):
 
 @router.post("/upload-csv-source-url")
 def upload_csv_source_url(payload: UrlPayload):
-    if os.getenv("VERCEL") == "1":
+    is_vercel = os.getenv("VERCEL") == "1" or os.getenv("VERCEL_ENV") is not None or os.getenv("AWS_REGION") is not None
+    if is_vercel:
         return {
             "status": "uploaded",
             "source_type": "csv_replay",
