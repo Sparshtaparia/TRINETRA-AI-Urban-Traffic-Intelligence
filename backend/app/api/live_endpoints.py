@@ -1,5 +1,6 @@
 from fastapi import APIRouter, UploadFile, File, Body
 from typing import Dict, Any, List
+from pydantic import BaseModel
 import pandas as pd
 import io
 import os
