@@ -1,13 +1,14 @@
-from fastapi import FastAPI, Request
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import JSONResponse
+import traceback
 import os
-from app.api import endpoints, live_endpoints
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+
+# ── capture startup errors so we can diagnose on Vercel ──────────────────────
+_startup_error: str = ""
 
 app = FastAPI(title="TRINETRA-P API")
 
-# CORS must be the FIRST middleware registered
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -16,27 +17,46 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Explicit OPTIONS handler so Vercel doesn't swallow the preflight
 @app.options("/{full_path:path}")
 async def options_handler(full_path: str):
-    return JSONResponse(
-        content={},
-        status_code=200,
-        headers={
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-            "Access-Control-Allow-Headers": "Content-Type, Authorization",
-        }
-    )
+    return JSONResponse(content={}, status_code=200, headers={
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    })
 
-app.include_router(endpoints.router, prefix="/api")
-app.include_router(live_endpoints.router, prefix="/api/live")
+# ── debug endpoint – always works even if routers fail to load ────────────────
+@app.get("/api/debug")
+def debug():
+    return {
+        "startup_error": _startup_error or None,
+        "VERCEL": os.getenv("VERCEL"),
+        "VERCEL_ENV": os.getenv("VERCEL_ENV"),
+        "AWS_REGION": os.getenv("AWS_REGION"),
+        "python_path": os.getenv("PYTHONPATH", ""),
+        "env_keys": sorted(k for k in os.environ if not k.startswith("npm_")),
+    }
 
-base_dir = os.path.dirname(__file__)
-figures_dir = os.path.join(base_dir, "processed", "figures")
-if os.path.exists(figures_dir):
-    app.mount("/api/static/figures", StaticFiles(directory=figures_dir), name="figures")
+@app.get("/api/health")
+def health():
+    if _startup_error:
+        return JSONResponse(status_code=500, content={"status": "crashed", "error": _startup_error})
+    return {"status": "ok"}
 
 @app.get("/")
-def read_root():
-    return {"status": "ok", "message": "TRINETRA-P Backend is running"}
+def root():
+    return {"status": "ok"}
+
+# ── load routers, catching any failure ────────────────────────────────────────
+try:
+    from app.api import endpoints, live_endpoints
+    app.include_router(endpoints.router, prefix="/api")
+    app.include_router(live_endpoints.router, prefix="/api/live")
+
+    from fastapi.staticfiles import StaticFiles
+    figures_dir = os.path.join(os.path.dirname(__file__), "processed", "figures")
+    if os.path.exists(figures_dir):
+        app.mount("/api/static/figures", StaticFiles(directory=figures_dir), name="figures")
+
+except Exception:
+    _startup_error = traceback.format_exc()
