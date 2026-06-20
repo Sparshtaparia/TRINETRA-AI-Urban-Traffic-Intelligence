@@ -1,0 +1,172 @@
+[
+  {
+    "step": "Column Standardization",
+    "status": "PASS",
+    "input_rows": 298450,
+    "output_rows": 298450,
+    "rows_removed": 0,
+    "time_seconds": 0.04,
+    "notes": "Column names normalized to lowercase snake_case.",
+    "column_map": {
+      "id": "id",
+      "latitude": "latitude",
+      "longitude": "longitude",
+      "location": "location",
+      "vehicle_number": "vehicle_number",
+      "vehicle_type": "vehicle_type",
+      "description": "description",
+      "violation_type": "violation_type",
+      "offence_code": "offence_code",
+      "created_datetime": "created_datetime",
+      "closed_datetime": "closed_datetime",
+      "modified_datetime": "modified_datetime",
+      "device_id": "device_id",
+      "created_by_id": "created_by_id",
+      "center_code": "center_code",
+      "police_station": "police_station",
+      "data_sent_to_scita": "data_sent_to_scita",
+      "junction_name": "junction_name",
+      "action_taken_timestamp": "action_taken_timestamp",
+      "data_sent_to_scita_timestamp": "data_sent_to_scita_timestamp",
+      "updated_vehicle_number": "updated_vehicle_number",
+      "updated_vehicle_type": "updated_vehicle_type",
+      "validation_status": "validation_status",
+      "validation_timestamp": "validation_timestamp"
+    }
+  },
+  {
+    "step": "Schema Detection",
+    "status": "PASS",
+    "input_rows": 298450,
+    "output_rows": 298450,
+    "rows_removed": 0,
+    "time_seconds": 0.007,
+    "notes": "Automatic schema detection completed.",
+    "detected_mapping": {
+      "timestamp": {
+        "detected_column": "created_datetime",
+        "confidence": "Medium",
+        "reason": "Partial match with synonym 'date'",
+        "manual_override_needed": false
+      },
+      "latitude": {
+        "detected_column": "latitude",
+        "confidence": "High",
+        "reason": "Exact synonym match",
+        "manual_override_needed": false
+      },
+      "longitude": {
+        "detected_column": "longitude",
+        "confidence": "High",
+        "reason": "Exact synonym match",
+        "manual_override_needed": false
+      },
+      "violation_type": {
+        "detected_column": "violation_type",
+        "confidence": "High",
+        "reason": "Exact synonym match",
+        "manual_override_needed": false
+      },
+      "zone": {
+        "detected_column": "police_station",
+        "confidence": "High",
+        "reason": "Exact synonym match",
+        "manual_override_needed": false
+      },
+      "vehicle_type": {
+        "detected_column": "vehicle_type",
+        "confidence": "High",
+        "reason": "Exact synonym match",
+        "manual_override_needed": false
+      },
+      "road_segment_id": {
+        "detected_column": null,
+        "confidence": "Missing",
+        "reason": "No matching column found",
+        "manual_override_needed": true
+      }
+    }
+  },
+  {
+    "step": "Timestamp Parsing",
+    "status": "PASS",
+    "input_rows": 298450,
+    "output_rows": 298450,
+    "rows_removed": 0,
+    "time_seconds": 0.208,
+    "notes": "Invalid timestamp rows: 5 (0.00%).",
+    "invalid_timestamps": 5,
+    "invalid_timestamp_rate": 0.0
+  },
+  {
+    "step": "Coordinate Validation",
+    "status": "PASS",
+    "input_rows": 298450,
+    "output_rows": 298450,
+    "rows_removed": 0,
+    "time_seconds": 0.033,
+    "notes": "Valid coordinate rows: 298450 (100.00%).",
+    "valid_coordinate_rows": 298450,
+    "valid_coordinate_rate": 1.0
+  },
+  {
+    "step": "Violation Text Cleaning",
+    "status": "PASS",
+    "input_rows": 298450,
+    "output_rows": 298450,
+    "rows_removed": 0,
+    "time_seconds": 0.381,
+    "notes": "Violation type text normalized."
+  },
+  {
+    "step": "Parking Record Filtering",
+    "status": "PASS",
+    "input_rows": 298450,
+    "output_rows": 298450,
+    "rows_removed": 0,
+    "time_seconds": 0.188,
+    "notes": "Parking-related rows retained using keyword filter. Match rate: 100.00%."
+  },
+  {
+    "step": "Duplicate Removal",
+    "status": "PASS",
+    "input_rows": 298450,
+    "output_rows": 298450,
+    "rows_removed": 0,
+    "time_seconds": 0.718,
+    "notes": "Removed 0 duplicate rows.",
+    "duplicate_rows_removed": 0
+  },
+  {
+    "step": "Segment ID Creation",
+    "status": "PASS",
+    "input_rows": 298450,
+    "output_rows": 298450,
+    "rows_removed": 0,
+    "time_seconds": 0.286,
+    "notes": "Segment creation method: grid_cell_precision_3. Unique segments: 7814. Avg records/segment: 38.2. Segments with single record: 23.3%.",
+    "segment_creation_method": "grid_cell_precision_3",
+    "unique_segments": 7814,
+    "avg_records_per_segment": 38.19,
+    "pct_single_record_segments": 0.233
+  },
+  {
+    "step": "Temporal Feature Creation",
+    "status": "PASS",
+    "input_rows": 298450,
+    "output_rows": 298450,
+    "rows_removed": 0,
+    "time_seconds": 0.191,
+    "notes": "Temporal features created from timestamp."
+  },
+  {
+    "step": "Data Quality Scoring",
+    "status": "PASS",
+    "input_rows": 298450,
+    "output_rows": 298450,
+    "rows_removed": 0,
+    "time_seconds": 0.08,
+    "notes": "Average record quality score: 100.0/100.",
+    "average_record_quality_score": 100.0
+  }
+]
