@@ -60,7 +60,7 @@ export function HistoricalConfigModal({ open, onOpenChange }: { open: boolean; o
     }
   };
 
-  const [url, setUrl] = useState("");
+  const [url, setUrl] = useState("https://drive.google.com/file/d/1urgkPnt-4Bk-neq6yyoXlVmJuWYIe9w4/view?usp=sharing");
 
   const handleUrlUpload = async () => {
     if (!url) return;

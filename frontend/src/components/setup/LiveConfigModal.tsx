@@ -76,7 +76,7 @@ export function LiveConfigModal({ open, onOpenChange }: { open: boolean; onOpenC
     }
   };
 
-  const [url, setUrl] = useState("");
+  const [url, setUrl] = useState("https://drive.google.com/file/d/1urgkPnt-4Bk-neq6yyoXlVmJuWYIe9w4/view?usp=sharing");
 
   const handleUrlUpload = async () => {
     if (!url) return;
@@ -279,7 +279,6 @@ export function LiveConfigModal({ open, onOpenChange }: { open: boolean; onOpenC
               />
             </div>
             {file && <span className="text-sm text-neutral-300">{file.name}</span>}
-          </div>
               
               {schemaStatus === "validating" && <div className="text-sm text-yellow-400 animate-pulse">Validating Live Schema...</div>}
               {schemaStatus === "ready" && (
