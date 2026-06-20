@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Radio, User, Search, BarChart2, ShieldAlert, Trophy, ClipboardCheck, BrainCircuit, Microscope, BookOpen, Sparkles, CheckCircle } from "lucide-react";
+import { ArrowLeft, Radio, User, Search, BarChart2, ShieldAlert, Trophy, ClipboardCheck, BrainCircuit, Microscope, BookOpen, Sparkles, CheckCircle, MapPin } from "lucide-react";
 import Link from "next/link";
 import { OverviewTab } from "@/components/dashboard/OverviewTab";
 import { RankingTab } from "@/components/dashboard/RankingTab";
@@ -11,10 +11,12 @@ import { AuditTab } from "@/components/dashboard/AuditTab";
 import { HiddenImpactZonesTab } from "@/components/dashboard/HiddenImpactZonesTab";
 import { AskTrinetraTab } from "@/components/dashboard/AskTrinetraTab";
 import { ResearchAnalyticsTab } from "@/components/dashboard/ResearchAnalyticsTab";
+import { StaticMapView } from "@/components/dashboard/StaticMapView";
 import { API_BASE } from "../../../lib/api";
 
 const TABS = [
   { value: "overview",           label: "Overview",            icon: BarChart2 },
+  { value: "map-view",           label: "Interactive Map",     icon: MapPin },
   { value: "research-analytics", label: "Research Analytics",  icon: Microscope },
   { value: "hidden-impact-zones",label: "Hidden Impact Zones", icon: ShieldAlert },
   { value: "enforcement-ranking",label: "Enforcement Ranking", icon: Trophy },
@@ -38,7 +40,11 @@ export default function StaticDashboard() {
       {/* Top Navigation */}
       <header className="h-16 border-b border-neutral-800 px-6 flex items-center justify-between bg-neutral-900/80 backdrop-blur-sm sticky top-0 z-30">
         <div className="flex items-center gap-4">
-          <Link href="/setup" className="p-2 hover:bg-neutral-800 rounded-lg transition-colors">
+          <Link
+            href="/setup"
+            className="p-2 hover:bg-neutral-800 rounded-lg transition-colors text-neutral-400 hover:text-white"
+            title="Back to Setup"
+          >
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div className="flex items-center gap-2 border-l border-neutral-800 pl-4">
@@ -126,6 +132,9 @@ export default function StaticDashboard() {
           <div className="flex-1 flex flex-col min-h-0">
             <TabsContent value="overview" className="mt-0 border-0 p-0 flex flex-col flex-1 overflow-y-auto min-h-0">
               <OverviewTab />
+            </TabsContent>
+            <TabsContent value="map-view" className="mt-0 border-0 p-0 flex flex-col flex-1 h-full min-h-0 data-[state=active]:flex">
+              <StaticMapView />
             </TabsContent>
             <TabsContent value="research-analytics" className="mt-0 border-0 p-0 flex flex-col flex-1 overflow-y-auto min-h-0">
               <ResearchAnalyticsTab />

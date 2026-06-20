@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { useEffect, useState } from "react";
 import {
   Activity, AlertTriangle, CheckCircle2, EyeOff, LayoutGrid, Loader2,
-  BrainCircuit, Zap, ShieldAlert, TrendingUp, AlertCircle, Lightbulb
+  BrainCircuit, Zap, ShieldAlert, TrendingUp, AlertCircle, Lightbulb, Sparkles
 } from "lucide-react";
 import { sessionCache } from "@/lib/cache";
 import { API_BASE } from "../../lib/api";
@@ -86,9 +86,9 @@ export function OverviewTab() {
     }
   }, [pipelineStatus, visibleStepIndex, isAnimating]);
 
-  // Fetch AI analysis once animation done and data loaded
-  useEffect(() => {
-    if (isAnimating || aiAnalysis || aiLoading) return;
+  // Fetch AI analysis manually
+  const handleRunAI = () => {
+    if (aiLoading || aiAnalysis) return;
     setAiLoading(true);
     fetch(API_BASE + "/api/analytics/ai-summary")
       .then(res => res.json())
@@ -98,7 +98,7 @@ export function OverviewTab() {
       })
       .catch(() => setAiError("Could not reach AI endpoint"))
       .finally(() => setAiLoading(false));
-  }, [isAnimating]);
+  };
 
   // ── Pipeline Animation Screen ──────────────────────────────────────────────
   if (isAnimating) {
@@ -270,12 +270,23 @@ export function OverviewTab() {
           <BrainCircuit className="w-5 h-5 text-[#39FF14]" />
           <div>
             <h3 className="font-bold text-white text-sm">TRINETRA AI — Intelligence Analysis</h3>
-            <p className="text-xs text-neutral-400">Gemini 1.5 Flash analyzing 298,450 records, 12 audit checks, and quadrant distribution in real-time</p>
+            <p className="text-xs text-neutral-400">Gemini 2.5 Flash analyzing dashboard metrics, 13 audit checks, and quadrant distribution in real-time</p>
           </div>
-          {aiLoading && (
+          {aiLoading ? (
             <div className="ml-auto flex items-center gap-2 text-xs text-[#39FF14]">
               <div className="w-3 h-3 border border-[#39FF14] border-t-transparent rounded-full animate-spin" />
               Analyzing...
+            </div>
+          ) : !aiAnalysis && (
+            <div className="ml-auto flex flex-col items-end gap-1">
+              <button
+                onClick={handleRunAI}
+                className="flex items-center gap-2 text-xs font-semibold bg-[#39FF14]/10 hover:bg-[#39FF14]/20 text-[#39FF14] border border-[#39FF14]/30 px-3 py-1.5 rounded-lg transition-colors"
+              >
+                <Sparkles className="w-3.5 h-3.5" />
+                Run AI Analysis
+              </button>
+              <span className="text-[10px] text-neutral-500">Saves API tokens by running on-demand</span>
             </div>
           )}
         </div>

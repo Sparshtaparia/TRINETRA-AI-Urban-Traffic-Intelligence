@@ -55,17 +55,23 @@ export interface LiveSnapshot {
 interface LiveSessionState {
   snapshot: LiveSnapshot | null;
   connected: boolean;
+  paused: boolean;
   loading: boolean;
   error: string | null;
   stopStream: () => Promise<void>;
+  pauseStream: () => Promise<void>;
+  resumeStream: () => Promise<void>;
 }
 
 const LiveSessionContext = createContext<LiveSessionState>({
   snapshot: null,
   connected: false,
+  paused: false,
   loading: false,
   error: null,
-  stopStream: async () => {}
+  stopStream: async () => {},
+  pauseStream: async () => {},
+  resumeStream: async () => {}
 });
 
 export function useLiveSession() {
@@ -79,7 +85,8 @@ export function LiveSessionProvider({ children }: { children: ReactNode }) {
   const activeRef = useRef(true);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const connected = snapshot?.status === "connected";
+  const connected = snapshot?.status === "connected" || snapshot?.status === "paused";
+  const paused = snapshot?.status === "paused";
 
   const doFetch = async () => {
     if (!activeRef.current) return;
@@ -117,6 +124,24 @@ export function LiveSessionProvider({ children }: { children: ReactNode }) {
     setSnapshot(null);
   };
 
+  const pauseStream = async () => {
+    try {
+      await fetch(`${API_BASE}/api/live/pause`, { method: "POST" });
+      setSnapshot(prev => prev ? { ...prev, status: "paused" } : null);
+    } catch (e) {
+      console.error("Pause stream error:", e);
+    }
+  };
+
+  const resumeStream = async () => {
+    try {
+      await fetch(`${API_BASE}/api/live/resume`, { method: "POST" });
+      setSnapshot(prev => prev ? { ...prev, status: "connected" } : null);
+    } catch (e) {
+      console.error("Resume stream error:", e);
+    }
+  };
+
   useEffect(() => {
     activeRef.current = true;
     const type = localStorage.getItem("live_source_type");
@@ -135,7 +160,7 @@ export function LiveSessionProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <LiveSessionContext.Provider value={{ snapshot, connected, loading, error, stopStream }}>
+    <LiveSessionContext.Provider value={{ snapshot, connected, paused, loading, error, stopStream, pauseStream, resumeStream }}>
       {children}
     </LiveSessionContext.Provider>
   );

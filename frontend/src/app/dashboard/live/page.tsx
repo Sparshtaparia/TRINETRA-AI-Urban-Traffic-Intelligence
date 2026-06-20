@@ -29,17 +29,18 @@ function LiveDashboardInner() {
       {/* Top Navigation */}
       <header className="h-16 border-b border-neutral-800 px-6 flex items-center justify-between bg-neutral-900/80 backdrop-blur-sm shrink-0">
         <div className="flex items-center gap-4">
-          <Link href="/setup" className="p-2 hover:bg-neutral-800 rounded-lg transition-colors">
+          <Link
+            href="/setup"
+            className="p-2 hover:bg-neutral-800 rounded-lg transition-colors text-neutral-400 hover:text-white"
+            title="Back to Setup"
+          >
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div className="flex items-center gap-2 border-l border-neutral-800 pl-4">
-            <Radio className={`w-5 h-5 ${snapshot?.status === "connected" ? "text-[#39FF14]" : "text-neutral-600"}`} />
+            <Radio className={`w-5 h-5 ${snapshot?.status === "connected" || snapshot?.status === "paused" ? "text-[#39FF14]" : "text-neutral-600"}`} />
             <span className="font-bold tracking-tight">TRINETRA-P</span>
-            <Badge variant="outline" className={`ml-2 text-xs ${snapshot?.status === "connected" ? "bg-orange-500/10 text-orange-400 border-orange-500/30" : "bg-neutral-800 text-neutral-500 border-neutral-700"}`}>
-              {snapshot?.status === "connected" ? "Live Operations" : "Disconnected"}
-            </Badge>
-            {snapshot?.status === "connected" && snapshot?.source_type && (
-              <Badge variant="outline" className="text-xs border-neutral-700 text-neutral-400 font-mono">
+            {(snapshot?.status === "connected" || snapshot?.status === "paused") && snapshot?.source_type && (
+              <Badge variant="outline" className="ml-2 text-xs border-neutral-700 text-neutral-400 font-mono">
                 {label}
               </Badge>
             )}

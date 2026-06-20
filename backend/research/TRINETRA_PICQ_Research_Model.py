@@ -6,11 +6,14 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-
-OUTPUT_DIR = Path("backend/processed")
+# Make sure OUTPUT_DIR points to backend/processed correctly, resolving absolutely from this file's location
+base_dir = Path(__file__).resolve().parent.parent
+OUTPUT_DIR = base_dir / "processed"
 FIGURE_DIR = OUTPUT_DIR / "figures"
 
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)

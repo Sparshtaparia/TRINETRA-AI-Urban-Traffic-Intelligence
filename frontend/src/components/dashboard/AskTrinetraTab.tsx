@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Send, Bot, User, Radio, Loader2, Sparkles, Lightbulb, TrendingUp, ShieldAlert, BarChart3, HelpCircle } from "lucide-react";
+import { Send, Bot, User, Radio, Loader2, Sparkles, Lightbulb, TrendingUp, ShieldAlert, BarChart3, HelpCircle, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { API_BASE } from "../../lib/api";
 
@@ -41,6 +41,13 @@ export function AskTrinetraTab() {
       sessionStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
     } catch {}
   }, [messages]);
+
+  const handleClear = () => {
+    sessionStorage.removeItem(STORAGE_KEY);
+    setMessages([
+      { role: "assistant", content: "I am **TRINETRA AI**, your parking intelligence analyst. I can explain the PICQ methodology, analyze dashboard metrics, verify data integrity, and recommend enforcement strategies. How can I assist?" }
+    ]);
+  };
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -93,6 +100,9 @@ export function AskTrinetraTab() {
             </div>
             <div className="text-[11px] text-neutral-500">Intelligence Mode &middot; {messages.length} messages</div>
           </div>
+          <button onClick={handleClear} className="p-1.5 hover:bg-neutral-800 rounded text-neutral-500 hover:text-red-400 transition-colors" title="Clear History">
+            <Trash2 className="w-4 h-4" />
+          </button>
           <Badge variant="outline" className="bg-[#39FF14]/5 text-[#39FF14] border-[#39FF14]/20 text-[10px]">
             <Sparkles className="w-3 h-3 mr-1" /> AI Ready
           </Badge>

@@ -2,7 +2,7 @@
 
 import { useRef, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Activity, AlertTriangle, Radio, Truck, Square, Zap } from "lucide-react";
+import { Activity, AlertTriangle, Radio, Truck, Square, Zap, Pause, Play } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useLiveSession } from "@/lib/LiveSessionProvider";
@@ -12,7 +12,7 @@ function NewEventDot() {
 }
 
 export function LiveCommandCenterTab() {
-  const { snapshot, connected, loading, stopStream } = useLiveSession();
+  const { snapshot, connected, paused, loading, stopStream, pauseStream, resumeStream } = useLiveSession();
   const prevCountRef = useRef(0);
   const newCountRef = useRef(0);
 
@@ -48,7 +48,7 @@ export function LiveCommandCenterTab() {
       <div className="flex justify-between items-center shrink-0">
         <h2 className="text-2xl font-bold text-white flex items-center gap-2">
           <Activity className="w-6 h-6 text-[#39FF14]" /> Live Operations Command Center
-          {connected && <NewEventDot />}
+          {connected && !paused && <NewEventDot />}
         </h2>
         <div className="flex items-center gap-3">
           {newEventsThisTick > 0 && (
@@ -57,9 +57,20 @@ export function LiveCommandCenterTab() {
             </Badge>
           )}
           {connected && (
-            <Button variant="destructive" size="sm" onClick={stopStream} className="bg-red-500/20 text-red-500 hover:bg-red-500/30 border border-red-500/50 shrink-0">
-              <Square className="w-4 h-4 mr-2" /> Stop Stream
-            </Button>
+            <div className="flex items-center gap-2">
+              {paused ? (
+                <Button variant="outline" size="sm" onClick={resumeStream} className="bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 border-blue-500/30 shrink-0">
+                  <Play className="w-4 h-4 mr-2" /> Resume
+                </Button>
+              ) : (
+                <Button variant="outline" size="sm" onClick={pauseStream} className="bg-yellow-500/10 text-yellow-500 hover:bg-yellow-500/20 border-yellow-500/30 shrink-0">
+                  <Pause className="w-4 h-4 mr-2" /> Pause
+                </Button>
+              )}
+              <Button variant="destructive" size="sm" onClick={stopStream} className="bg-red-500/20 text-red-500 hover:bg-red-500/30 border border-red-500/50 shrink-0">
+                <Square className="w-4 h-4 mr-2" /> Stop Stream
+              </Button>
+            </div>
           )}
         </div>
       </div>

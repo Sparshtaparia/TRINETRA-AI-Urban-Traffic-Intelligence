@@ -1,13 +1,20 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, AlertCircle, Loader2 } from "lucide-react";
 import { useLiveSession } from "@/lib/LiveSessionProvider";
 import { API_BASE } from "../../lib/api";
 
-type MapState = "loading" | "missing_key" | "no_coordinates" | "ready" | "error";
+type MapState =
+  | "loading"
+  | "loading_sdk"
+  | "missing_key"
+  | "sdk_failed"
+  | "no_coordinates"
+  | "ready"
+  | "error";
 
 interface CoordEvent {
   event_id: string;
@@ -27,7 +34,11 @@ export function LiveMapView() {
   const [mapError, setMapError] = useState<string | null>(null);
   const [coordEvents, setCoordEvents] = useState<CoordEvent[]>([]);
   const [mapSdkLoaded, setMapSdkLoaded] = useState(false);
-  const { connected } = useLiveSession();
+  const { connected, paused } = useLiveSession();
+
+  const mapRef = useRef<any>(null);
+  const markersRef = useRef<any[]>([]);
+  const isInitializing = useRef(false);
 
   // Check for MapMyIndia SDK key
   const mapSdkKey = process.env.NEXT_PUBLIC_MAPMYINDIA_MAP_SDK_KEY || null;
@@ -37,12 +48,102 @@ export function LiveMapView() {
       setMapState("missing_key");
       return;
     }
-    setMapState("loading");
+
+    if (isInitializing.current) return;
+    isInitializing.current = true;
+    setMapState("loading_sdk");
+
+    const initMap = () => {
+      try {
+        // @ts-ignore
+        if (!window.mappls) {
+          throw new Error("window.mappls is not available after SDK load");
+        }
+
+        if (mapRef.current) {
+          setMapSdkLoaded(true);
+          return;
+        }
+
+        // @ts-ignore
+        const newMap = new window.mappls.Map("mapmyindia-container", {
+          center: [12.9716, 77.5946],
+          zoom: 11,
+        });
+
+        mapRef.current = newMap;
+        setMapSdkLoaded(true);
+
+        // Only mark ready if coordinate data already exists
+        setMapState((prev) => {
+          if (coordEvents.length > 0) return "ready";
+          return prev === "loading_sdk" ? "no_coordinates" : prev;
+        });
+      } catch (err: any) {
+        console.error("Mappls init failed:", err);
+        setMapError(err?.message || "Mappls SDK initialized but map creation failed.");
+        setMapState("sdk_failed");
+        setMapSdkLoaded(false);
+      }
+    };
+
+    // If SDK is already loaded
+    // @ts-ignore
+    if (window.mappls) {
+      initMap();
+      return;
+    }
+
+    const existingScript = document.getElementById("mappls-script") as HTMLScriptElement | null;
+
+    if (existingScript) {
+      existingScript.addEventListener("load", initMap);
+      existingScript.addEventListener("error", () => {
+        setMapError("Mappls SDK script failed to load.");
+        setMapState("sdk_failed");
+      });
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.id = "mappls-script";
+    script.src = `https://apis.mappls.com/advancedmaps/api/${mapSdkKey}/map_sdk?layer=vector&v=3.0`;
+    script.async = true;
+    script.defer = true;
+
+    const timeout = window.setTimeout(() => {
+      // @ts-ignore
+      if (!window.mappls) {
+        setMapError("Mappls SDK load timed out. Check key, enabled Web Maps SDK, CORS/domain, or network.");
+        setMapState("sdk_failed");
+        setMapSdkLoaded(false);
+      }
+    }, 10000);
+
+    script.onload = () => {
+      window.clearTimeout(timeout);
+
+      // Sometimes SDK global appears slightly after onload
+      setTimeout(initMap, 300);
+    };
+
+    script.onerror = () => {
+      window.clearTimeout(timeout);
+      setMapError("Mappls SDK script failed to load. Check SDK key and asset approval.");
+      setMapState("sdk_failed");
+      setMapSdkLoaded(false);
+    };
+
+    document.head.appendChild(script);
+
+    return () => {
+      window.clearTimeout(timeout);
+    };
   }, [mapSdkKey]);
 
   // Fetch coordinate events
   useEffect(() => {
-    if (!connected) return;
+    if (!connected && !paused) return;
 
     const fetchMapEvents = async () => {
       try {
@@ -56,7 +157,7 @@ export function LiveMapView() {
           if (valid.length === 0) {
             setMapState("no_coordinates");
           } else {
-            setMapState("ready");
+            setMapState(mapSdkLoaded ? "ready" : "loading_sdk");
           }
           setMapError(null);
         } else {
@@ -72,15 +173,70 @@ export function LiveMapView() {
     fetchMapEvents();
     const interval = setInterval(fetchMapEvents, 3000);
     return () => clearInterval(interval);
-  }, [connected]);
+  }, [connected, paused, mapSdkLoaded]);
 
-  const renderState = () => {
+  // Render markers
+  useEffect(() => {
+    if (!mapSdkLoaded || !mapRef.current) return;
+    
+    try {
+      // Clear old markers
+      markersRef.current.forEach(m => {
+        if (m && typeof m.remove === 'function') m.remove();
+      });
+      markersRef.current = [];
+
+      // Render new markers
+      coordEvents.forEach(evt => {
+        // @ts-ignore
+        if (window.mappls && window.mappls.Marker) {
+          // @ts-ignore
+          const marker = new window.mappls.Marker({
+            map: mapRef.current,
+            position: { lat: evt.latitude, lng: evt.longitude },
+            popupHtml: `<div style="padding: 4px; color: black; font-family: sans-serif;">
+                          <strong>${evt.road_segment_id}</strong><br/>
+                          Severity: <span style="color: red;">${evt.severity.toFixed(2)}</span><br/>
+                          ${evt.zone}
+                        </div>`
+          });
+          markersRef.current.push(marker);
+        }
+      });
+    } catch (e) {
+      console.error("Failed to render markers", e);
+    }
+  }, [coordEvents, mapSdkLoaded]);
+
+  const renderOverlay = () => {
     switch (mapState) {
       case "loading":
         return (
           <div className="flex flex-col items-center justify-center py-24 text-neutral-500 gap-3">
             <Loader2 className="w-10 h-10 animate-spin text-neutral-700" />
             <p className="font-medium">Loading map data...</p>
+          </div>
+        );
+
+      case "loading_sdk":
+        return (
+          <div className="flex flex-col items-center justify-center py-24 text-neutral-500 gap-3">
+            <Loader2 className="w-10 h-10 animate-spin text-neutral-600" />
+            <p className="font-medium">Initializing MapMyIndia SDK...</p>
+            <p className="text-sm text-neutral-500 text-center max-w-md">
+              Loading Mappls Web SDK. If this stays for more than 10 seconds, check SDK key, Web Maps SDK activation, and allowed domains.
+            </p>
+          </div>
+        );
+
+      case "sdk_failed":
+        return (
+          <div className="flex flex-col items-center justify-center py-24 text-neutral-500 gap-3">
+            <AlertCircle className="w-10 h-10 text-red-500" />
+            <p className="font-medium text-red-400">MapMyIndia SDK failed.</p>
+            <p className="text-sm text-neutral-500 text-center max-w-md">
+              {mapError || "Could not initialize Mappls SDK."}
+            </p>
           </div>
         );
 
@@ -117,44 +273,12 @@ export function LiveMapView() {
         );
 
       case "ready":
-        return (
-          <div className="flex-1 flex flex-col min-h-0">
-            {/* Map placeholder — replace with actual MapMyIndia SDK when key is present */}
-            <div className="flex-1 bg-neutral-950 rounded-lg border border-neutral-800 relative overflow-hidden">
-              {mapSdkLoaded ? (
-                <div id="mapmyindia-container" className="w-full h-full" />
-              ) : (
-                <div className="absolute inset-0 flex flex-col items-center justify-center text-neutral-500 p-8">
-                  <MapPin className="w-12 h-12 text-neutral-700 mb-4" />
-                  <p className="text-lg font-medium mb-2">{coordEvents.length} Coordinate Points</p>
-                  <p className="text-sm text-neutral-600 text-center max-w-lg mb-6">
-                    MapMyIndia SDK loading... Place <code className="font-mono bg-neutral-900 px-1.5 py-0.5 rounded">mapmyindia-gl</code>{" "}
-                    in package.json to render the interactive map.
-                  </p>
-                  {/* Fallback: show coordinate list */}
-                  <div className="w-full max-w-lg max-h-64 overflow-y-auto space-y-2">
-                    {coordEvents.slice(-20).map((evt) => (
-                      <div key={evt.event_id} className="flex items-center justify-between p-2 rounded bg-neutral-900 text-xs">
-                        <span className="font-mono text-neutral-300">{evt.event_id}</span>
-                        <span className="text-neutral-400">{evt.road_segment_id}</span>
-                        <span className="text-neutral-500">{evt.zone}</span>
-                        <span className={evt.severity >= 0.8 ? "text-red-400" : "text-neutral-400"}>
-                          {evt.severity.toFixed(2)}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        );
+        return null;
     }
   };
 
   return (
     <div className="flex-1 flex flex-col min-h-0">
-      {/* Header */}
       <div className="flex items-center justify-between mb-4 shrink-0">
         <h2 className="text-2xl font-bold text-white flex items-center gap-2">
           <MapPin className="w-6 h-6 text-orange-500" /> Live Map
@@ -169,8 +293,20 @@ export function LiveMapView() {
         </div>
       </div>
 
-      <Card className="flex-1 flex flex-col bg-neutral-900 border-neutral-800 overflow-hidden min-h-0">
-        {renderState()}
+      <Card className="flex-1 flex flex-col bg-neutral-900 border-neutral-800 overflow-hidden min-h-0 p-1 relative">
+        {/* Map Container is always in the DOM so Mappls SDK can attach to it on mount */}
+        <div 
+          id="mapmyindia-container" 
+          className="w-full h-full absolute inset-0 z-0" 
+          style={{ opacity: mapState === "ready" && mapSdkLoaded ? 1 : 0 }}
+        />
+
+        {/* Overlay covers the map until ready */}
+        {(mapState !== "ready" || !mapSdkLoaded) && (
+          <div className="absolute inset-0 z-10 bg-neutral-900 flex flex-col items-center justify-center">
+            {renderOverlay()}
+          </div>
+        )}
       </Card>
     </div>
   );

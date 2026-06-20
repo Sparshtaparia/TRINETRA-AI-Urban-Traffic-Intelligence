@@ -18,6 +18,20 @@ export function HistoricalConfigModal({ open, onOpenChange }: { open: boolean; o
     setIsProcessing(true);
     setStatusText(`Uploading ${file.name}...`);
 
+    const statuses = [
+      "Running data validation checks...",
+      "Normalizing geo-coordinates...",
+      "Mapping vehicle and violation types...",
+      "Computing baseline severity scores...",
+      "Detecting anomalies in timestamp distributions...",
+      "Preparing TRINETRA-P core pipeline..."
+    ];
+    let sIdx = 0;
+    const interval = setInterval(() => {
+      setStatusText(statuses[sIdx % statuses.length]);
+      sIdx++;
+    }, 2000);
+
     const formData = new FormData();
     formData.append("file", file);
 
@@ -26,6 +40,7 @@ export function HistoricalConfigModal({ open, onOpenChange }: { open: boolean; o
         method: "POST",
         body: formData,
       });
+      clearInterval(interval);
       const data = await res.json();
       if (data.status === "success") {
         setStatusText("Dataset processed. Opening Dashboard...");
@@ -38,6 +53,7 @@ export function HistoricalConfigModal({ open, onOpenChange }: { open: boolean; o
         setStatusText("");
       }
     } catch (err) {
+      clearInterval(interval);
       alert("Network error. Ensure backend is running.");
       setIsProcessing(false);
       setStatusText("");

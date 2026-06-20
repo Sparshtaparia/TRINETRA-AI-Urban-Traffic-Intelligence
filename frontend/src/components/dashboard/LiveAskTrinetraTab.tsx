@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Send, Bot, User, Radio, Activity, Loader2, Sparkles, ShieldAlert, TrendingUp, Zap, HelpCircle, MapPin } from "lucide-react";
+import { Send, Bot, User, Radio, Activity, Loader2, Sparkles, ShieldAlert, TrendingUp, Zap, HelpCircle, MapPin, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useLiveSession } from "@/lib/LiveSessionProvider";
 import { API_BASE } from "../../lib/api";
@@ -41,6 +41,11 @@ export function LiveAskTrinetraTab() {
       sessionStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
     } catch {}
   }, [messages]);
+
+  const handleClear = () => {
+    sessionStorage.removeItem(STORAGE_KEY);
+    setMessages([]);
+  };
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -93,11 +98,16 @@ export function LiveAskTrinetraTab() {
                 : "No live events yet"}
             </div>
           </div>
-          {analytics && hasEvents && (
-            <Badge variant="outline" className="bg-[#39FF14]/5 text-[#39FF14] border-[#39FF14]/20 text-[10px]">
-              <ShieldAlert className="w-3 h-3 mr-1" /> {analytics.critical_alerts} critical
-            </Badge>
-          )}
+          <div className="flex items-center gap-3">
+            <button onClick={handleClear} className="p-1.5 hover:bg-neutral-800 rounded text-neutral-500 hover:text-red-400 transition-colors" title="Clear History">
+              <Trash2 className="w-4 h-4" />
+            </button>
+            {analytics && hasEvents && (
+              <Badge variant="outline" className="bg-[#39FF14]/5 text-[#39FF14] border-[#39FF14]/20 text-[10px]">
+                <ShieldAlert className="w-3 h-3 mr-1" /> {analytics.critical_alerts} critical
+              </Badge>
+            )}
+          </div>
         </div>
 
         <div className="flex-1 overflow-y-auto min-h-0 scroll-smooth">

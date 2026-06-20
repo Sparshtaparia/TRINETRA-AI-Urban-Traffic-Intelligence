@@ -126,13 +126,13 @@ async def get_ai_summary():
     import google.generativeai as genai
     from dotenv import load_dotenv
 
-    load_dotenv()
-    api_key = os.getenv("Gemini_API")
-    if not api_key:
-        return {"status": "failed", "error": "Gemini_API key not found in environment"}
-
-    # Configure SDK
-    genai.configure(api_key=api_key)
+    base_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+    env_path = os.path.join(base_dir, ".env")
+    load_dotenv(dotenv_path=env_path)
+    
+    keys = [os.getenv(k) for k in ["Gemini_API", "GEMINI_API_KEY_1", "GEMINI_API_KEY_2", "GEMINI_API_KEY_3"] if os.getenv(k)]
+    if not keys:
+        return {"status": "failed", "error": "No Gemini API keys found in environment"}
 
     base_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
     processed_dir = os.path.join(base_dir, "processed")
@@ -187,37 +187,37 @@ Please respond with a JSON object with exactly these keys:
 
 Use the actual numbers from the data. Be specific and cite real values."""
 
-    try:
-        # Try gemini-2.5-flash as requested by user, fallback to 1.5-flash if 404 occurs
+    last_err = None
+    for key in keys:
         try:
+            genai.configure(api_key=key)
             model = genai.GenerativeModel('gemini-2.5-flash')
             response = await model.generate_content_async(prompt)
-        except Exception as fallback_err:
-            if "404" in str(fallback_err) or "not found" in str(fallback_err).lower():
-                model = genai.GenerativeModel('gemini-1.5-flash')
-                response = await model.generate_content_async(prompt)
-            else:
-                raise fallback_err
-
-        raw_text = response.text
-        
-        # Extract JSON from markdown code block if present
-        import re
-        match = re.search(r"```(?:json)?\s*([\s\S]*?)```", raw_text)
-        if match:
-            raw_text = match.group(1).strip()
+            raw_text = response.text
             
-        analysis = json.loads(raw_text)
-        return {"status": "success", "analysis": analysis}
-    except json.JSONDecodeError as e:
-        return {"status": "success", "analysis": {"executive_summary": raw_text, "key_findings": [], "quick_wins": [], "risk_flags": [], "policy_recommendation": "", "data_confidence": ""}}
+            # Extract JSON from markdown code block if present
+            import re
+            match = re.search(r"```(?:json)?\s*([\s\S]*?)```", raw_text)
+            if match:
+                raw_text = match.group(1).strip()
+                
+            analysis = json.loads(raw_text)
+            return {"status": "success", "analysis": analysis}
+        except json.JSONDecodeError as e:
+            return {"status": "success", "analysis": {"executive_summary": raw_text, "key_findings": [], "quick_wins": [], "risk_flags": [], "policy_recommendation": "", "data_confidence": ""}}
+        except Exception as e:
+            last_err = e
+            continue
+
+    try:
+        raise last_err
     except Exception as e:
         # Detailed error message for frontend
         error_msg = str(e)
         if "API key" in error_msg:
             error_msg = "Invalid Gemini API Key. Please update the .env file."
         elif "404" in error_msg:
-            error_msg = "Model version not found. The API key may not have access to this Gemini model."
+            error_msg = "Model version not found or not accessible."
         return {"status": "failed", "error": error_msg}
 
 class ChatMessage(BaseModel):
@@ -237,12 +237,13 @@ async def ask_trinetra(req: ChatRequest):
     import google.generativeai as genai
     from dotenv import load_dotenv
 
-    load_dotenv()
-    api_key = os.getenv("Gemini_API")
-    if not api_key:
-        return {"status": "failed", "error": "Gemini_API key not found"}
-
-    genai.configure(api_key=api_key)
+    base_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+    env_path = os.path.join(base_dir, ".env")
+    load_dotenv(dotenv_path=env_path)
+    
+    keys = [os.getenv(k) for k in ["Gemini_API", "GEMINI_API_KEY_1", "GEMINI_API_KEY_2", "GEMINI_API_KEY_3"] if os.getenv(k)]
+    if not keys:
+        return {"status": "failed", "error": "No Gemini API keys found in environment"}
 
     base_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
     processed_dir = os.path.join(base_dir, "processed")
@@ -279,40 +280,36 @@ Every single response you provide MUST follow this exact markdown structure (use
 
 Respond directly to the user's query while strictly adhering to the guardrails and response format."""
 
-    try:
-        model = genai.GenerativeModel(
-            model_name='gemini-2.5-flash',
-            system_instruction=system_prompt
-        )
-        
-        # Convert history
-        gemini_history = []
-        for msg in req.history:
-            role = "user" if msg.role == "user" else "model"
-            gemini_history.append({"role": role, "parts": [msg.content]})
+    last_err = None
+    for key in keys:
+        try:
+            genai.configure(api_key=key)
+            model = genai.GenerativeModel(
+                model_name='gemini-2.5-flash',
+                system_instruction=system_prompt
+            )
             
-        chat = model.start_chat(history=gemini_history)
-        response = await chat.send_message_async(req.query)
-        
-        return {"status": "success", "reply": response.text}
-        
-    except Exception as fallback_err:
-        # Fallback to 1.5-flash if 2.5-flash is not found (404)
-        if "404" in str(fallback_err) or "not found" in str(fallback_err).lower():
-            try:
-                model = genai.GenerativeModel(
-                    model_name='gemini-1.5-flash',
-                    system_instruction=system_prompt
-                )
+            # Convert history
+            gemini_history = []
+            for msg in req.history:
+                role = "user" if msg.role == "user" else "model"
+                gemini_history.append({"role": role, "parts": [msg.content]})
                 
-                gemini_history = []
-                for msg in req.history:
-                    role = "user" if msg.role == "user" else "model"
-                    gemini_history.append({"role": role, "parts": [msg.content]})
-                    
-                chat = model.start_chat(history=gemini_history)
-                response = await chat.send_message_async(req.query)
-                return {"status": "success", "reply": response.text}
-            except Exception as inner_e:
-                return {"status": "failed", "error": str(inner_e)}
-        return {"status": "failed", "error": str(fallback_err)}
+            chat = model.start_chat(history=gemini_history)
+            response = await chat.send_message_async(req.query)
+            
+            return {"status": "success", "reply": response.text}
+            
+        except Exception as e:
+            last_err = e
+            continue
+
+    try:
+        raise last_err
+    except Exception as e:
+        error_msg = str(e)
+        if "API key" in error_msg:
+            error_msg = "Invalid Gemini API Key."
+        elif "404" in error_msg:
+            error_msg = "Model version not found or not accessible."
+        return {"status": "failed", "error": error_msg}
