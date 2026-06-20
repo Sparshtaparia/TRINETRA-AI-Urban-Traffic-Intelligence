@@ -613,13 +613,21 @@ LIVE METRICS CONTEXT:
     last_err = None
     for key in keys:
         try:
-            genai.configure(api_key=key)
-            model = genai.GenerativeModel('gemini-2.5-flash', system_instruction=system_prompt)
-            response = model.generate_content(question)
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={key}"
+            headers = {"Content-Type": "application/json"}
+            payload = {
+                "system_instruction": {"parts": [{"text": system_prompt}]},
+                "contents": [{"parts": [{"text": question}]}]
+            }
+            import requests
+            response = requests.post(url, headers=headers, json=payload)
+            response.raise_for_status()
+            data = response.json()
+            raw_text = data["candidates"][0]["content"]["parts"][0]["text"]
             
             return {
                 "status": "ready",
-                "answer": response.text,
+                "answer": raw_text,
                 "evidence": evidence
             }
         except Exception as e:

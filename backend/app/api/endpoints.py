@@ -141,7 +141,7 @@ async def get_ai_summary():
     Calls Gemini API with all real pipeline artifacts and returns structured B2G analysis.
     Uses official google-generativeai SDK with fallback models.
     """
-    import google.generativeai as genai
+    from dotenv import load_dotenv
     from dotenv import load_dotenv
 
     base_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
@@ -208,10 +208,14 @@ Use the actual numbers from the data. Be specific and cite real values."""
     last_err = None
     for key in keys:
         try:
-            genai.configure(api_key=key)
-            model = genai.GenerativeModel('gemini-2.5-flash')
-            response = await model.generate_content_async(prompt)
-            raw_text = response.text
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={key}"
+            headers = {"Content-Type": "application/json"}
+            payload = {"contents": [{"parts": [{"text": prompt}]}]}
+            import requests
+            response = requests.post(url, headers=headers, json=payload)
+            response.raise_for_status()
+            data = response.json()
+            raw_text = data["candidates"][0]["content"]["parts"][0]["text"]
             
             # Extract JSON from markdown code block if present
             import re
@@ -298,24 +302,31 @@ Every single response you provide MUST follow this exact markdown structure (use
 Respond directly to the user's query while strictly adhering to the guardrails and response format."""
 
     last_err = None
+    import requests
     for key in keys:
         try:
-            genai.configure(api_key=key)
-            model = genai.GenerativeModel(
-                model_name='gemini-2.5-flash',
-                system_instruction=system_prompt
-            )
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={key}"
+            headers = {"Content-Type": "application/json"}
             
-            # Convert history
-            gemini_history = []
+            # Convert history to Gemini format
+            contents = []
             for msg in req.history:
-                role = "user" if msg.role == "user" else "model"
-                gemini_history.append({"role": role, "parts": [msg.content]})
-                
-            chat = model.start_chat(history=gemini_history)
-            response = await chat.send_message_async(req.query)
+                contents.append({"role": "user" if msg.role == "user" else "model", "parts": [{"text": msg.content}]})
+            contents.append({"role": "user", "parts": [{"text": req.query}]})
             
-            return {"status": "success", "reply": response.text}
+            payload = {
+                "system_instruction": {"parts": [{"text": system_prompt}]},
+                "contents": contents
+            }
+            
+            response = requests.post(url, headers=headers, json=payload)
+            response.raise_for_status()
+            data = response.json()
+            
+            return {
+                "status": "success",
+                "reply": data["candidates"][0]["content"]["parts"][0]["text"]
+            }
             
         except Exception as e:
             last_err = e
