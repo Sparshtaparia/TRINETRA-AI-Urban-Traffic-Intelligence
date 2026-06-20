@@ -134,7 +134,7 @@ export default function StaticDashboard() {
               <OverviewTab />
             </TabsContent>
             <TabsContent value="map-view" className="mt-0 border-0 p-0 flex flex-col flex-1 h-full min-h-0 data-[state=active]:flex">
-              <StaticMapView />
+              {activeTab === "map-view" && <StaticMapView />}
             </TabsContent>
             <TabsContent value="research-analytics" className="mt-0 border-0 p-0 flex flex-col flex-1 overflow-y-auto min-h-0">
               <ResearchAnalyticsTab />

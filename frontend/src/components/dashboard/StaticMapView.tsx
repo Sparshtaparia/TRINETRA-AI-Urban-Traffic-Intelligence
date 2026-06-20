@@ -210,8 +210,8 @@ export function StaticMapView() {
         )}
       </div>
 
-      <div className="flex-1 w-full relative bg-neutral-950">
-        <div id="static-mapmyindia-container" className="absolute inset-0 z-0" />
+      <div className="flex-1 w-full relative bg-neutral-950 min-h-[500px]">
+        <div id="static-mapmyindia-container" className="w-full h-full min-h-[500px]" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }} />
         
         {mapState !== "ready" && (
           <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-neutral-950/80 backdrop-blur-sm border border-neutral-800 rounded-xl m-2">
