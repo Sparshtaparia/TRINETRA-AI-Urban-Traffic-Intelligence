@@ -1,0 +1,1467 @@
+You are an elite national hackathon-winning product architect, senior full-stack engineer, AI/ML lead, geospatial intelligence researcher, urban mobility systems engineer, SaaS UX strategist, and pitch-winning founder.
+
+Build a complete, production-grade SaaS web application called:
+
+**TRINETRA-P**
+
+Full name:
+**TRINETRA-P: Parking-Induced Congestion Intelligence Platform**
+
+Tagline:
+**AI-Powered Parking Congestion Intelligence for Targeted Urban Enforcement**
+
+One-line positioning:
+**TRINETRA-P converts parking violation records and live violation events into explainable, road-segment-level congestion impact intelligence, helping enforcement teams prioritize where towing and patrol action will recover the maximum road capacity.**
+
+Product category:
+**B2B GovTech + Urban Mobility + AI/ML SaaS + Geospatial Intelligence**
+
+Primary users:
+
+1. Traffic police command centers
+2. Parking enforcement teams
+3. Tow-truck dispatch operators
+4. Smart city mobility cells
+5. Urban transport planners
+6. Municipal enforcement departments
+7. Road infrastructure researchers
+8. Event/metro/commercial-zone traffic control teams
+
+Core problem:
+Illegal and spillover on-street parking near commercial areas, metro stations, schools, hospitals, markets, junctions, and event zones reduces effective carriageway width, slows traffic, causes queue spillback, and creates enforcement pressure. Today, enforcement is mostly patrol-based and reactive. Existing systems show simple heatmaps or violation counts, but they do not answer the most important operational question:
+
+**Which parking violations are causing the highest congestion damage, and where should enforcement act first to recover the most road capacity?**
+
+TRINETRA-P must solve this by combining parking violation records, geospatial context, temporal recurrence, road sensitivity, congestion-impact proxies, and live event streams into an explainable enforcement intelligence platform.
+
+This must be built as if it is being judged in a national-level hackathon final. It must look, feel, and behave like a real enterprise product, not a student dashboard.
+
+The application must clearly demonstrate:
+
+1. Research novelty
+2. Technical depth
+3. Real-world deployment feasibility
+4. Explainable AI / explainable scoring
+5. Geospatial intelligence
+6. Static + live data-source architecture
+7. Mathematical auditability
+8. Production-grade UX
+9. Working MVP reliability
+10. Demo storytelling for judges
+
+==================================================
+PRODUCT VISION
+==============
+
+TRINETRA-P is a dual-mode parking-induced congestion intelligence platform.
+
+It works in two modes:
+
+1. **Historical Intelligence Mode**
+
+   * Uses stored Flipkart/BTP parking dataset or uploaded CSV/Excel.
+   * Computes PICQ, RRE, Hidden Impact Zones, enforcement ranking, quadrant analysis, audit verification, and planning insights.
+   * Answers:
+     **Where should the city plan enforcement based on historical parking-induced congestion patterns?**
+
+2. **Live Operations Mode**
+
+   * Uses CSV/Excel polling, REST API polling, WebSocket streams, CCTV/YOLO events via Kafka, or demo live stream.
+   * Computes dynamic PICQ updates, live events, alerts, dispatch recommendations, active violations, and live map intelligence.
+   * Answers:
+     **Where should the next tow/patrol unit go right now?**
+
+The product must not merely show a parking violation heatmap. It must explain why a segment is risky and what enforcement action is recommended.
+
+Each high-priority segment should generate:
+
+* PICQ score
+* RRE score
+* Quadrant classification
+* Hidden Impact Zone status
+* Violation pressure
+* Road sensitivity / context proxy
+* Temporal recurrence
+* Data confidence
+* Recommended enforcement action
+* Audit-verifiable metric explanation
+* Map/segment visualization if coordinates exist
+
+Core research novelty:
+
+**A normal heatmap ranks areas by violation count. TRINETRA-P ranks road segments by expected congestion impact and recoverable road capacity after enforcement.**
+
+==================================================
+CORE METHODOLOGY
+================
+
+The platform is based on **PICQ: Parking-Induced Congestion Quantification**.
+
+PICQ converts parking violation records into congestion-impact intelligence.
+
+Core metrics:
+
+1. **POP — Parking Obstruction Pressure**
+   Measures how frequently and persistently illegal parking occurs on a segment.
+
+2. **CSI — Capacity Sensitivity Index**
+   Measures how sensitive a road segment is to obstruction based on road/context features.
+
+3. **PICL — Parking-Induced Capacity Loss**
+   Estimates how much effective capacity is lost due to parking pressure on sensitive roads.
+
+4. **PICQ — Parking-Induced Congestion Quantification**
+   Final normalized congestion-impact score.
+
+5. **RRE — Road Recovery Estimate**
+   Estimated recoverable road capacity after enforcement.
+
+6. **HIZ — Hidden Impact Zone**
+   Segments with low/medium violation count but high congestion impact.
+
+7. **EGC — Enforcement Gap Coefficient**
+   Measures how much high-impact congestion burden is not being addressed.
+
+8. **EROA — Enforcement Return on Action**
+   Expected road recovery per enforcement unit/resource.
+
+9. **Data Confidence Score**
+   Indicates how reliable the score is based on data completeness, recency, coordinate quality, and recurrence strength.
+
+Quadrants:
+
+* **Q1 Immediate Dispatch**
+  High violation count + high congestion impact.
+
+* **Q2 Hidden Impact Zone**
+  Low/medium violation count + high congestion impact.
+
+* **Q3 Suppressed Heatmap Zone**
+  High violation count + low congestion impact.
+
+* **Q4 Routine Monitor**
+  Low violation count + low congestion impact.
+
+Most important demo insight:
+
+**Standard violation heatmaps over-prioritize Q3 high-volume but low-impact zones. TRINETRA-P discovers Q2 Hidden Impact Zones where fewer violations create disproportionate congestion damage.**
+
+==================================================
+TECHNICAL ARCHITECTURE
+======================
+
+Build a modern full-stack SaaS architecture.
+
+Frontend:
+
+* Next.js
+* TypeScript
+* Tailwind CSS
+* ShadCN/UI or equivalent component system
+* Recharts for charts
+* MapMyIndia / Mappls or fallback map panel
+* Framer Motion for subtle premium animations
+* Responsive layout
+* Dark enterprise command-center UI
+* Route-safe navigation
+* No broken empty states
+
+Backend:
+
+* FastAPI
+* Python 3.11+
+* Pandas / NumPy
+* Scikit-learn
+* Optional GeoPandas / Shapely / OSMnx if available
+* Pydantic validation
+* Chunked CSV processing
+* JSON-safe error handling
+* Runtime datasource state
+* REST APIs
+* WebSocket or polling-based live update support
+* Demo stream support
+
+Database / storage:
+
+* For MVP, file-backed cached outputs are acceptable.
+* Store uploaded datasets in `backend/uploads/`.
+* Store processed outputs in `backend/processed/`.
+* Store audit reports in `backend/reports/`.
+* Optional PostgreSQL/PostGIS-ready structure.
+
+Geospatial:
+
+* MapMyIndia / Mappls integration if keys are configured.
+* Map fallback if SDK key missing or coordinates unavailable.
+* Backend must never expose MapMyIndia client secret to frontend.
+
+MVP rule:
+**Reliability > decorative UI.**
+The software must load data, compute metrics, show audit, and run live demo correctly before visual polish.
+
+==================================================
+DATA SOURCE ARCHITECTURE
+========================
+
+Build the platform as data-source-agnostic.
+
+Unified internal event schema:
+
+```json
+{
+  "event_id": "EVT-001",
+  "timestamp": "2026-06-18T10:30:00",
+  "latitude": 12.9716,
+  "longitude": 77.5946,
+  "road_segment_id": "SEG-1042",
+  "violation_type": "illegal_parking",
+  "vehicle_type": "car",
+  "severity": 0.82,
+  "source": "csv_upload",
+  "confidence": 0.91,
+  "zone": "central",
+  "raw_payload": {}
+}
+```
+
+Allowed source values:
+
+* `flipkart_dataset`
+* `csv_upload`
+* `excel_upload`
+* `csv_polling`
+* `excel_polling`
+* `rest_api`
+* `websocket`
+* `kafka_yolo`
+* `demo_stream`
+
+Every source must normalize into this schema before scoring.
+
+==================================================
+USER FLOW
+=========
+
+Correct app flow:
+
+```text
+Landing Page
+→ Data Source Setup
+→ Configure Historical or Live source
+→ Validate source
+→ Process/connect source
+→ Dashboard opens with real data
+```
+
+Never allow this broken flow:
+
+```text
+Select mode
+→ empty dashboard
+→ 0 metrics
+→ disconnected forever
+```
+
+Dashboard must be gated behind configured source.
+
+Every dashboard must have:
+
+* Change Data Source button
+* Settings button
+* Profile button
+* Search
+* Clear source status
+* Real error recovery
+* No dashboard loop hell
+
+Browser Back behavior:
+
+* From dashboard, Back should return to data source selection.
+* Do not force redirect loops.
+* Do not trap user in dashboard if source exists.
+* Use route history properly.
+
+==================================================
+PAGE 1: LANDING PAGE
+====================
+
+Create a premium SaaS landing page.
+
+Style:
+
+* Cream/off-white outer background
+* Dark charcoal command-center mockup
+* Electric green accent
+* Premium typography
+* Glassmorphism cards
+* Subtle product motion
+* No cartoon visuals
+* No generic robot graphics
+* Looks like Stripe + Linear + Palantir + smart-city command center
+
+Hero title:
+**Quantify Parking-Induced Congestion Before It Gridlocks the City.**
+
+Subtitle:
+**TRINETRA-P transforms parking violation records and live enforcement events into explainable congestion-impact intelligence, helping traffic teams prioritize the zones where action recovers the most road capacity.**
+
+Primary CTA:
+**Launch Intelligence Platform**
+
+Secondary CTA:
+**View PICQ Methodology**
+
+Hero visual:
+A floating product UI showing:
+
+* PICQ 84
+* RRE 17%
+* 1,562 Hidden Impact Zones
+* 2,173 Suppressed Heatmap Zones
+* Q2 detected near junction
+* Tow Unit 2 ETA 8 min
+* Live AI console typing operational insights
+
+Hero animation:
+
+* No weird graph dot.
+* Use SVG line draw or scanner line.
+* Compact live typing console.
+* Event rows directly below typing area.
+* Subtle data-flow particles.
+* Browser frame floats slowly.
+* No huge empty gaps.
+* No clipped text.
+* Premium SaaS motion.
+
+Hero console example:
+
+```text
+● LIVE FEED
+
+> TRINETRA AI
+  PICQ score increased from 61 to 84_
+
+10:42  SEG-1042  PICQ +23
+10:43  Q2 Hidden Impact Zone
+10:44  Tow Unit 2  ETA 8 min
+```
+
+Landing sections:
+
+1. Problem
+2. Why heatmaps fail
+3. PICQ methodology
+4. Static + live architecture
+5. Enforcement workflow
+6. Map intelligence
+7. Audit verification
+8. Demo CTA
+
+==================================================
+PAGE 2: DATA SOURCE SETUP
+=========================
+
+Create a premium onboarding page.
+
+Header:
+**PICQ ENGINE SETUP**
+
+Title:
+**Configure Intelligence Source**
+
+Subtitle:
+**Select how TRINETRA-P should receive parking-violation intelligence: historical batch data for planning or live streams for real-time operations.**
+
+Show two main cards:
+
+1. **Historical Intelligence**
+   Badge: Batch Mode
+   Description:
+   **Analyze stored or uploaded parking datasets to discover persistent violation pressure, Hidden Impact Zones, road recovery estimates, and enforcement plans.**
+
+2. **Real-Time Operations**
+   Badge: Streaming Mode
+   Description:
+   **Connect polling, API, WebSocket, or CCTV/YOLO Kafka events to update PICQ live, trigger alerts, and recommend dispatch actions.**
+
+Bottom pipeline:
+
+```text
+Data Source → Event Normalizer → PICQ Engine → Enforcement Intelligence
+```
+
+Mode explanation:
+
+```text
+Historical Mode answers: Where should the city plan enforcement?
+Live Mode answers: Where should the next unit go now?
+```
+
+Clicking a card must open source configuration modal.
+Do not open dashboard directly.
+
+==================================================
+PAGE 3: HISTORICAL DATASET CONFIGURATION
+========================================
+
+Historical mode must show only two user-facing options:
+
+1. **Use Flipkart Dataset**
+2. **Upload CSV / Excel File**
+
+Do not show these as user-facing options:
+
+* Use existing segment_rre_scores.csv
+* Use sample dataset
+* Near-real-time CSV polling
+
+Those are internal implementation details.
+
+---
+
+## OPTION 1: USE FLIPKART DATASET
+
+Text:
+**Use Flipkart Dataset**
+
+Description:
+**Run TRINETRA-P on the competition parking dataset already stored in the repository.**
+
+Button:
+**Load Flipkart Dataset**
+
+Internal loading priority:
+
+1. If `backend/processed/segment_rre_scores.csv` exists:
+
+   * Load directly.
+   * Do not recompute raw dataset.
+   * Must complete under 5 seconds.
+
+2. Else if `backend/segment_rre_scores.csv` exists:
+
+   * Load directly.
+   * Do not recompute raw dataset.
+
+3. Else if `backend/snapped_parking_data.csv` exists:
+
+   * Process raw dataset.
+   * Generate processed output.
+   * Cache results.
+
+4. Else:
+
+   * Show:
+     **Flipkart dataset not found in repository. Please upload a CSV/Excel file.**
+
+---
+
+## OPTION 2: UPLOAD CSV / EXCEL FILE
+
+Text:
+**Upload CSV / Excel File**
+
+Description:
+**Upload your own parking violation dataset and map its columns to the TRINETRA schema.**
+
+Supported formats:
+
+* `.csv`
+* `.xlsx`
+* `.xls`
+
+Required upload flow:
+
+1. Choose file
+2. Upload file
+3. Validate columns
+4. Auto-detect schema mapping
+5. Allow manual correction only if needed
+6. Process with PICQ engine
+7. Show pipeline verification
+8. Open dashboard
+
+File upload must actually work:
+
+* Real `<input type="file">`
+* Drag/drop upload area
+* Show filename
+* Show file size
+* Show file type
+* Use `FormData`
+* Do not process immediately after file select
+
+Large file support:
+
+* 100MB+ CSV must not crash.
+* Backend saves upload in chunks.
+* Validation reads preview rows only.
+* Processing should be chunked or clearly staged.
+
+Modal dimensions:
+
+* Max height 85vh
+* Scrollable body
+* Sticky footer buttons
+* Validate/Process buttons must always be visible
+* User must never need to zoom out to click buttons
+
+==================================================
+COLUMN AUTO-MATCHING
+====================
+
+The system must intelligently detect columns before asking for manual dropdown selection.
+
+Target schema:
+
+* timestamp
+* latitude
+* longitude
+* violation_type
+* zone optional
+* vehicle_type optional
+* road_segment_id optional
+
+Synonyms:
+
+```text
+timestamp:
+timestamp, date, datetime, time, violation_time, offence_time, challan_time, created_at
+
+latitude:
+latitude, lat, y, gps_lat
+
+longitude:
+longitude, lon, lng, long, x, gps_lng, gps_long
+
+violation_type:
+violation_type, offence_type, offense_type, violation, offence, offense, violation_name, challan_type
+
+zone:
+zone, area, police_station, station, locality, beat, ward, district
+
+vehicle_type:
+vehicle_type, vehicle, class, vehicle_class
+
+road_segment_id:
+road_segment_id, segment_id, road_id, link_id, segment, road_segment
+```
+
+Detection logic:
+
+1. Normalize column names
+2. Exact synonym match
+3. Fuzzy string match
+4. Sample value validation
+5. Confidence scoring
+
+Show UI:
+
+```text
+Auto-detected schema mapping
+
+Timestamp → challan_date_time   High confidence
+Latitude → latitude             High confidence
+Longitude → longitude           High confidence
+Violation Type → offence_type   High confidence
+Zone → police_station           Medium confidence
+```
+
+If required fields are detected with high/medium confidence:
+Enable:
+**Process with Detected Mapping**
+
+Manual dropdowns remain available for correction.
+
+==================================================
+STATIC DASHBOARD
+================
+
+Static dashboard top tabs:
+
+1. Overview
+2. Historical Description
+3. PICQ Analytics
+4. Hotspot Map
+5. Hidden Impact Zones
+6. Enforcement Ranking
+7. Map Intelligence
+8. Audit Verification
+9. Ask TRINETRA
+
+Sidebar and top tabs must be synchronized using one canonical active tab state.
+
+Do not allow one nav to move while the other remains stuck.
+
+Use tab IDs:
+
+* `overview`
+* `historical-description`
+* `picq-analytics`
+* `hotspot-map`
+* `hidden-impact-zones`
+* `enforcement-ranking`
+* `map-intelligence`
+* `audit-verification`
+* `ask-trinetra`
+
+Each tab must render real content. No blank tabs.
+
+---
+
+## STATIC OVERVIEW
+
+Show KPI cards:
+
+1. Total Analyzed Segments
+2. Average PICQ
+3. Peak PICQ
+4. Critical RRE Zones
+5. Hidden Impact Zones
+6. Suppressed Heatmap Zones
+
+Use real computed values only.
+
+If processed Flipkart file is loaded and values are reproducible, expected values may be:
+
+* Total analyzed segments: 14,098
+* Average PICQ: 26.61
+* Peak PICQ: 100.0
+* RRE > 60 critical zones: 4
+* Q1 Immediate Dispatch: 5,488
+* Q2 Hidden Impact Zones: 1,562
+* Q3 Suppressed Heatmap Zones: 2,173
+* Q4 Routine Monitor: 4,875
+
+Do not hardcode these except in explicit demo fallback mode.
+
+---
+
+## HISTORICAL DESCRIPTION TAB
+
+Must match same dark dashboard theme.
+
+Content:
+
+* Dataset source summary
+* PICQ explanation
+* RRE explanation
+* Quadrant explanation
+* What static mode answers
+* Limitations
+
+---
+
+## PICQ ANALYTICS TAB
+
+Show:
+
+* PICQ score distribution
+* Average / median / max PICQ
+* PICQ by quadrant
+* Top PICQ segments
+* Interpretation text
+
+---
+
+## HOTSPOT MAP TAB
+
+If coordinates exist:
+
+* Show coordinate-based hotspot visualization.
+
+If coordinates missing:
+
+* Show graceful fallback:
+  **Hotspot Map requires latitude/longitude or road geometry. Current dataset does not contain usable coordinates.**
+
+Do not show blank tab.
+
+---
+
+## HIDDEN IMPACT ZONES TAB
+
+Show Q2 zones only.
+
+Explain:
+**Q2 Hidden Impact Zones are locations with lower violation counts but high expected congestion impact. Standard heatmaps often miss them.**
+
+Table:
+
+* Segment / zone
+* PICQ
+* RRE
+* Violations
+* Data confidence
+* Recommended action
+
+---
+
+## ENFORCEMENT RANKING TAB
+
+Canonical endpoint:
+`GET /api/analytics/enforcement-ranking`
+
+All top segment tables across app must use this endpoint.
+
+Table:
+
+* Rank
+* Segment / zone
+* PICQ
+* RRE
+* Quadrant
+* Violations
+* Enforcement score
+* Recommended action
+
+Sort by:
+`enforcement_score desc`
+
+If enforcement_score missing, compute:
+
+```text
+enforcement_score =
+0.45 * normalized_picq +
+0.35 * normalized_rre +
+0.20 * normalized_violation_pressure
+```
+
+Do not show top enforcement rows with meaningless RRE 0.0 and violations `—` unless audited and explained.
+
+---
+
+## MAP INTELLIGENCE TAB
+
+Must never show infinite loading.
+
+Map state machine:
+
+* checking_config
+* loading_sdk
+* loading_segments
+* initializing_map
+* ready
+* missing_key
+* placeholder_key
+* sdk_failed
+* no_coordinates
+* endpoint_failed
+* init_failed
+
+If SDK key missing:
+**Map SDK key missing. Add NEXT_PUBLIC_MAPMYINDIA_MAP_SDK_KEY in frontend .env.local and restart frontend.**
+
+If key is placeholder:
+**Map SDK key is still a placeholder. Replace it with the REST / Map SDK key from MapMyIndia.**
+
+If no coordinates:
+**Map Intelligence requires latitude/longitude or road geometry. Current dataset has no usable coordinates.**
+
+If SDK fails:
+**Map SDK failed to load. Check key, domain whitelist, or network access.**
+
+Never show:
+**Map Interface Loading...**
+forever.
+
+Map markers:
+
+* Q1 red
+* Q2 yellow
+* Q3 cyan/blue
+* Q4 green/neutral
+
+Popup:
+
+* segment
+* PICQ
+* RRE
+* quadrant
+* violations
+* recommended action
+
+---
+
+## AUDIT VERIFICATION TAB
+
+This is critical.
+
+Mathematically verify all dashboard metrics from actual loaded data.
+
+Audit checks:
+
+* Total analyzed segments = number of rows
+* Average PICQ = mean(picq_score)
+* Median PICQ = median(picq_score)
+* Peak PICQ = max(picq_score)
+* Average RRE = mean(rre_score)
+* Critical RRE Zones = count(rre_score > 60)
+* Hidden Impact Zones = count(quadrant == Q2)
+* Q1 Count = count(Q1)
+* Q2 Count = count(Q2)
+* Q3 Count = count(Q3)
+* Q4 Count = count(Q4)
+* Suppressed Heatmap Zones = Q3 count
+* RRE zero rate
+* Missing violation count rate
+* Enforcement ranking validity
+* Quadrant threshold consistency
+* Pipeline verification pass/fail
+
+Show formula + computed value + displayed value + pass/fail.
+
+Example:
+
+```text
+Hidden Impact Zones
+Formula: count(quadrant == "Q2")
+Computed: 1,562
+Displayed: 1,562
+Status: PASS
+```
+
+If mismatch:
+
+* Show red warning
+* Show difference
+* Show likely reason
+
+Do not compare metric to itself. Audit must recompute from source dataframe/output.
+
+---
+
+## ASK TRINETRA TAB
+
+Add working assistant panel.
+
+Layout:
+
+* Fixed-height chat panel
+* Scrollable messages
+* Fixed input bar
+* Suggested prompt chips
+* Must not grow infinitely as chat grows
+
+Suggested prompts:
+
+* Explain Q2 Hidden Impact Zones
+* Why is average PICQ important?
+* Show top enforcement zones
+* Verify dashboard metrics
+* Explain RRE
+* What should enforcement do first?
+
+Assistant should answer from loaded metrics and methodology.
+If no data loaded:
+**Load a dataset first so I can answer using TRINETRA intelligence.**
+
+==================================================
+PIPELINE VERIFICATION
+=====================
+
+After processing any uploaded dataset, show pipeline verification.
+
+Stages:
+
+1. File uploaded
+2. File readable
+3. Schema detected
+4. Required columns mapped
+5. Parking records filtered
+6. Events normalized
+7. Segments generated
+8. PICQ computed
+9. RRE computed
+10. Quadrants assigned
+11. Enforcement ranking generated
+12. Dashboard metrics synchronized
+
+Each stage:
+
+* status: pass / warn / fail
+* input count
+* output count
+* time taken
+* notes/error
+
+Dashboard must not open if critical pipeline stages fail.
+
+==================================================
+SCORING LOGIC
+=============
+
+Implement transparent scoring. Do not use fake default values.
+
+If `segment_rre_scores.csv` already has:
+
+* picq_score
+* rre_score
+* quadrant
+
+then load and audit directly.
+
+If uploaded/raw dataset lacks scores:
+compute them.
+
+Feature engineering:
+
+* segment_id from road_segment_id if available
+* else segment_id from rounded lat/lon grid
+* else segment_id from zone/area if coordinates unavailable
+* violations = count per segment
+* recurrence = unique active days per segment
+* peak hour ratio
+* night/peak pressure
+* severity proxy
+* road/context sensitivity proxy if map/geospatial context missing
+* data confidence
+
+Parking Obstruction Pressure:
+
+```text
+POP = weighted combination of violation pressure, recurrence, severity, peak-hour pressure
+```
+
+Capacity Sensitivity Index:
+
+```text
+CSI = weighted combination of road/context proxy, junction/POI proxy if available, fallback sensitivity
+```
+
+Parking-Induced Capacity Loss:
+
+```text
+PICL = POP * CSI
+```
+
+Road Recovery Estimate:
+
+```text
+RRE = clipped normalized function of PICL, PICQ, and violation pressure
+```
+
+PICQ:
+
+```text
+PICQ = weighted combination of POP, CSI, PICL, recurrence, severity/context
+```
+
+Final score must be normalized 0–100.
+
+Quadrant logic:
+
+* High/low violation threshold from median or configurable percentile
+* High/low impact threshold from median PICQ or configurable threshold
+* Q1 = high violation + high impact
+* Q2 = low violation + high impact
+* Q3 = high violation + low impact
+* Q4 = low violation + low impact
+
+Important:
+Do not assign Q1 with very low PICQ unless threshold logic explains it and audit shows it.
+
+==================================================
+LIVE MODE CONFIGURATION
+=======================
+
+Live mode main options:
+
+1. Near-real-time CSV / Excel Polling
+2. REST API Polling
+3. WebSocket Stream
+4. CCTV / YOLO Event Feed via Kafka
+
+Add secondary fallback:
+**Start Demo Live Stream**
+
+Dynamic mode top tabs must only be:
+
+1. Live Command Center
+2. Live Map
+3. Active Violations
+
+Static tabs must never appear in live mode.
+
+Use separate state:
+
+* activeStaticTab
+* activeLiveTab
+
+Do not mix nav state.
+
+---
+
+## LIVE CSV / EXCEL POLLING
+
+Must allow:
+
+* file picker
+* backend-accessible file path
+* poll interval seconds
+* start button
+
+If browser upload snapshot is used:
+
+* Explain it is replay mode, not true local polling.
+
+Modes:
+
+* CSV append polling
+* CSV replay mode
+
+If source is CSV polling, do not attempt WebSocket connection.
+Do not show WebSocket error during CSV polling.
+
+Correct conditional:
+
+* websocket source → connect WebSocket
+* csv_polling/rest/kafka → use polling endpoint or backend buffer
+* demo stream → use backend-generated events or polling
+
+Live CSV replay must emit events within 1–2 seconds.
+
+---
+
+## REST API POLLING
+
+Fields:
+
+* endpoint URL
+* poll interval
+* optional auth token
+
+Connect only if endpoint returns valid normalized or mappable events.
+If no events:
+show honest warning.
+
+---
+
+## WEBSOCKET STREAM
+
+Fields:
+
+* WebSocket URL
+* optional auth token
+
+Show WebSocket error only for WebSocket source.
+
+---
+
+## CCTV / YOLO VIA KAFKA
+
+Fields:
+
+* Kafka broker
+* topic
+* consumer group
+
+If Kafka unavailable:
+show:
+**Kafka connection unavailable. Use Demo Live Stream for presentation mode.**
+
+==================================================
+LIVE DASHBOARD
+==============
+
+Header:
+**Live Operations Command Center**
+
+Subtitle:
+**Streaming parking violation events into dynamic PICQ and dispatch intelligence.**
+
+Status examples:
+
+* CONNECTED · CSV REPLAY MODE
+* CONNECTED · CSV APPEND POLLING
+* CONNECTED · REST POLLING
+* CONNECTED · WEBSOCKET
+* CONNECTED · KAFKA YOLO
+* CONNECTED · DEMO STREAM
+
+Metric cards:
+
+1. Active Events
+2. Events/sec
+3. Critical Alerts
+4. Highest PICQ Delta
+5. Recommended Dispatch
+6. Data Latency
+7. Avg Severity 5m
+8. Events Received
+
+If no events:
+
+* Do not show fake SEG-1042 dispatch.
+* Show:
+  **No dispatch recommendation until live events are received.**
+
+If connected but no events for 10 seconds:
+Show:
+**Connected, but no events received yet. Use replay mode or verify source is producing events.**
+
+Live incident stream:
+
+* Time
+* Event ID
+* Segment
+* Severity
+* PICQ delta
+* Source
+* Recommended action
+
+Dispatch:
+
+* Use actual event buffer
+* Recommend segment with highest severity/PICQ delta
+* Show ETA if map/route available
+* Otherwise show estimated static ETA
+
+==================================================
+GLOBAL SEARCH
+=============
+
+Implement real search.
+
+Search should work across:
+
+* Segment ID
+* Zone
+* Road name
+* Quadrant
+* PICQ level
+* RRE level
+* Violation type
+* Live event ID
+* Dispatch unit
+
+If no source loaded:
+**Load a dataset or connect a live source to enable search.**
+
+Search result example:
+
+```text
+SEG-1042
+Q2 Hidden Impact Zone · PICQ 84 · RRE 17%
+```
+
+==================================================
+PROFILE AND SETTINGS
+====================
+
+Create real pages:
+
+`/profile`
+`/settings`
+
+Profile page:
+
+* User name
+* Role
+* Current mode
+* Current datasource
+* Last loaded dataset
+* Last processing time
+* Metrics availability
+* Session status
+* Editable local preferences
+
+Settings page:
+
+* Default datasource mode
+* Default map provider
+* Live refresh interval
+* Enable demo stream
+* Enable map intelligence
+* Enable audit panel
+* API base URL
+* Backend status
+* Save settings to localStorage/app state
+
+No fake buttons. Every button must update state, open modal, or show useful feedback.
+
+==================================================
+BACKEND API ENDPOINTS
+=====================
+
+Static:
+
+* `POST /api/static/load-flipkart`
+* `POST /api/static/upload-dataset`
+* `POST /api/static/validate-dataset`
+* `POST /api/static/process-dataset`
+* `GET /api/static/pipeline-verification`
+
+Analytics:
+
+* `GET /api/analytics/summary`
+* `GET /api/analytics/enforcement-ranking`
+* `GET /api/analytics/quadrants`
+* `GET /api/analytics/hidden-impact-zones`
+* `GET /api/analytics/map-segments`
+* `GET /api/analytics/audit-verification`
+* `GET /api/analytics/picq-distribution`
+
+Live:
+
+* `POST /api/live/start-file-polling`
+* `POST /api/live/start-api-polling`
+* `POST /api/live/connect-websocket`
+* `POST /api/live/connect-kafka-yolo`
+* `POST /api/live/start-demo-stream`
+* `POST /api/live/stop`
+* `GET /api/live/status`
+* `GET /api/live/events`
+* `GET /api/live/alerts`
+* `GET /api/live/dispatch`
+* `GET /api/live/map-events`
+
+Shared:
+
+* `GET /api/datasource/status`
+* `POST /api/datasource/reset`
+* `GET /api/search?q=&mode=`
+* `GET /api/health`
+* `GET /api/health/mvp-audit`
+
+Map:
+
+* `GET /api/map/reverse-geocode`
+* `GET /api/map/route`
+* `GET /api/dispatch/eta`
+
+Every endpoint must return JSON, including errors.
+
+Never return plain `Internal Server Error`.
+
+==================================================
+ERROR HANDLING
+==============
+
+Frontend safe parse:
+
+```ts
+async function safeParseResponse(response: Response) {
+  const contentType = response.headers.get("content-type") || "";
+
+  if (contentType.includes("application/json")) {
+    return await response.json();
+  }
+
+  const text = await response.text();
+
+  return {
+    status: "failed",
+    error: text || `Request failed with status ${response.status}`,
+    httpStatus: response.status
+  };
+}
+```
+
+Backend must wrap endpoints in try/except and return JSON:
+
+```python
+{
+  "status": "failed",
+  "error": "...",
+  "type": "..."
+}
+```
+
+No JSON parse errors should be shown to users.
+
+==================================================
+PERFORMANCE REQUIREMENTS
+========================
+
+Processed Flipkart file:
+
+* load under 5 seconds
+* summary compute under 2 seconds
+
+CSV upload:
+
+* 100MB CSV must upload without crashing
+* validation preview under 5 seconds
+* no full-file read during validation
+* chunked save
+* chunked/aggregated processing where possible
+
+Live demo:
+
+* events start within 1–2 seconds
+* events_received increases
+* incident stream populates
+* no fake dispatch before events
+* last events buffer capped at 100
+
+Frontend:
+
+* no infinite loaders
+* no dashboard with fake zero metrics
+* no map infinite loading
+* no nav state corruption
+* no layout requiring 30% zoom
+* no Google font external build dependency that can fail offline
+
+Use system/local fonts or include fallback.
+
+==================================================
+SECURITY REQUIREMENTS
+=====================
+
+* No secrets committed.
+* `.env` must be ignored.
+* `.env.example` only placeholders.
+* MapMyIndia client secret backend only.
+* Frontend only uses `NEXT_PUBLIC_MAPMYINDIA_MAP_SDK_KEY`.
+* Uploaded filenames sanitized.
+* File extension validation.
+* File size limit with clean error.
+* No stack traces in production UI.
+* Rotate credentials if exposed.
+
+==================================================
+MAPMYINDIA ENVIRONMENT
+======================
+
+Backend:
+
+```env
+MAPMYINDIA_REST_API_KEY=
+MAPMYINDIA_CLIENT_ID=
+MAPMYINDIA_CLIENT_SECRET=
+MAPMYINDIA_BASE_URL=https://apis.mapmyindia.com
+```
+
+Frontend:
+
+```env
+NEXT_PUBLIC_MAPMYINDIA_MAP_SDK_KEY=
+NEXT_PUBLIC_ENABLE_MAPMYINDIA=true
+```
+
+If frontend SDK key is missing/placeholder, map should show diagnostic, not infinite loading.
+
+==================================================
+MVP AUDIT REPORT
+================
+
+Generate:
+
+`TRINETRA_P_MVP_AUDIT_REPORT.md`
+
+Include:
+
+1. Executive summary
+2. Architecture
+3. Dataset files found
+4. Static pipeline status
+5. Uploaded pipeline status
+6. Live mode status
+7. API endpoints verified
+8. Metrics computed
+9. Audit verification results
+10. Map intelligence status
+11. Performance measurements
+12. Known limitations
+13. How to run
+14. How to demo
+15. What is real vs demo fallback
+
+Do not fake audit results.
+
+==================================================
+README REQUIREMENTS
+===================
+
+README must include:
+
+1. Product overview
+2. Problem statement
+3. PICQ methodology
+4. Dual-mode architecture
+5. Dataset setup
+6. How to load Flipkart dataset
+7. How to upload CSV/Excel
+8. How to start demo live stream
+9. API docs
+10. MapMyIndia setup
+11. Environment variables
+12. Demo script
+13. Known limitations
+14. Future work
+
+==================================================
+DEMO SCRIPT
+===========
+
+First 90 seconds:
+
+1. Open landing page.
+2. Explain:
+   **Normal heatmaps show where violations are frequent. TRINETRA-P shows where violations damage traffic the most.**
+3. Launch platform.
+4. Select Historical Intelligence.
+5. Load Flipkart dataset.
+6. Show Overview metrics.
+7. Open Hidden Impact Zones.
+8. Explain Q2 discovery.
+9. Open Enforcement Ranking.
+10. Open Audit Verification.
+11. Show metric pass/fail verification.
+12. Switch to Live Operations.
+13. Start Demo Live Stream or CSV Replay.
+14. Show events appearing.
+15. Show dispatch recommendation.
+16. End with:
+    **Historical mode plans enforcement. Live mode tells the next unit where to go now.**
+
+==================================================
+FINAL ACCEPTANCE CRITERIA
+=========================
+
+The software is acceptable only if:
+
+1. Landing page works.
+2. Data Source Setup works.
+3. Historical mode loads stored dataset or shows clear upload fallback.
+4. Upload CSV/Excel has real file picker.
+5. Column mapping is auto-detected.
+6. Pipeline verification works.
+7. Static dashboard metrics are non-fake.
+8. PICQ Analytics tab works.
+9. Hotspot Map tab works or has fallback.
+10. Hidden Impact Zones tab works.
+11. Enforcement Ranking uses canonical endpoint.
+12. Map Intelligence never loads forever.
+13. Audit Verification mathematically verifies metrics.
+14. Ask TRINETRA is usable and fixed-height.
+15. Search works on loaded data.
+16. Settings/Profile are real pages.
+17. Browser Back returns to datasource page.
+18. Live mode only has three tabs:
+
+    * Live Command Center
+    * Live Map
+    * Active Violations
+19. Live CSV polling/replay emits events.
+20. WebSocket error does not appear for CSV polling.
+21. Live dispatch is based on real event buffer.
+22. No fake SEG-1042 when no events exist.
+23. No infinite loaders.
+24. No broken empty tabs.
+25. No dashboard loop hell.
+26. No JSON parse errors.
+27. Backend always returns JSON.
+28. Build succeeds.
+29. README is complete.
+30. MVP audit report is generated.
+
+Build TRINETRA-P from scratch as a serious, audit-ready, national hackathon-winning urban mobility intelligence SaaS.
+
+End goal:
+TRINETRA-P should make judges say:
+
+**“This is not just a parking dashboard. This is an enforcement intelligence operating system.”**
