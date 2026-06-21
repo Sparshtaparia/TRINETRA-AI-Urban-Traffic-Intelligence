@@ -3,9 +3,8 @@
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { ChevronDown, ChevronUp, ExternalLink } from "lucide-react";
-import { API_BASE } from "../../lib/api";
-
-const BASE = API_BASE + "/figures";
+// Charts served from Next.js public/figures/ — Vercel CDN, no API needed
+const BASE = "/figures";
 
 interface PlotGroup {
   title: string;

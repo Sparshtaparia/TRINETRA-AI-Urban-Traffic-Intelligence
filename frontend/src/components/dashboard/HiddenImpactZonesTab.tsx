@@ -48,7 +48,7 @@ export function HiddenImpactZonesTab() {
       {/* Mathematical Analysis Graph */}
       <div className="p-6 border-b border-neutral-800 bg-neutral-950 flex justify-center">
         <img 
-          src={API_BASE + "/figures/14_top_hidden_impact_zones.png"} 
+          src={"/figures/14_top_hidden_impact_zones.png"} 
           alt="Hidden Impact Zones Mathematical Analysis" 
           className="max-h-[400px] object-contain rounded border border-neutral-800 shadow-xl"
         />
