@@ -45,6 +45,16 @@ def health():
         return JSONResponse(status_code=500, content={"status": "crashed", "error": _startup_error})
     return {"status": "ok"}
 
+@app.get("/api/health")
+def health_check():
+    return {"status": "ok"}
+
+@app.get("/api/debug-env")
+def debug_env():
+    import os
+    keys = {k: "SET" if os.getenv(k) else "MISSING" for k in ["Gemini_API", "GEMINI_API_KEY_1", "GEMINI_API_KEY_2", "GEMINI_API_KEY_3", "MAPMYINDIA_REST_API_KEY"]}
+    return {"status": "ok", "env_vars": keys}
+
 @app.get("/")
 def root():
     return {"status": "ok"}
