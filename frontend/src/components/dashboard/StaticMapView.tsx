@@ -232,7 +232,7 @@ export function StaticMapView({ isActive = true }: { isActive?: boolean }) {
             {mapState === "loading" && (
               <>
                 <Loader2 className="w-8 h-8 text-neutral-500 animate-spin mb-4" />
-                <p className="text-neutral-400 font-medium">Fetching Map Segments...</p>
+                <p className="text-neutral-400 font-medium">Fetching Map Segments... (Waking up server, please wait up to 30s)</p>
               </>
             )}
             

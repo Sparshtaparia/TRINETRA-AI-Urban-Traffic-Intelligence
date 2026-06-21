@@ -64,7 +64,7 @@ export function RankingTab() {
       <div className="flex items-center gap-3 mb-6">
         <div className="w-5 h-5 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />
         <span className="font-mono text-sm text-blue-400 tracking-wider">
-          Building Enforcement Dispatch Index · 298,450 segments
+          Building Enforcement Dispatch Index · 298,450 segments (Waking up server, please wait up to 30s)
         </span>
       </div>
       <div className="space-y-2">

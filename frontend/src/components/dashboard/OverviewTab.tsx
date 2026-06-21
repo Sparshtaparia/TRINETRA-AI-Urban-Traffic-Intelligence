@@ -121,7 +121,7 @@ export function OverviewTab() {
           <span className="font-mono text-sm text-[#39FF14] tracking-wider">
             {phaseDone ? "Pipeline Complete — Rendering Intelligence..."
               : pipelineStatus ? `Running TRINETRA-P Pipeline · ${pipelineStatus.total_rows.toLocaleString()} rows`
-              : "Initializing TRINETRA-P Pipeline..."}
+              : "Initializing TRINETRA-P Pipeline... (Waking up server, please wait up to 30s)"}
           </span>
         </div>
         <div className="space-y-2">
