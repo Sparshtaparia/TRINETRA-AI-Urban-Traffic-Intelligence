@@ -263,7 +263,10 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 SUPABASE_URL=your_supabase_url
 SUPABASE_KEY=your_supabase_key
 DATABASE_URL=your_database_url
-Gemini_API=your_gemini_api_key
+Gemini_API=your_primary_gemini_api_key
+GEMINI_API_KEY_1=your_backup_gemini_api_key_1
+GEMINI_API_KEY_2=your_backup_gemini_api_key_2
+GEMINI_API_KEY_3=your_backup_gemini_api_key_3
 MAPMYINDIA_REST_API_KEY=your_mapmyindia_rest_key
 MAPMYINDIA_CLIENT_ID=your_mapmyindia_client_id
 MAPMYINDIA_CLIENT_SECRET=your_mapmyindia_client_secret
@@ -323,6 +326,24 @@ The backend runs at:
 ```txt
 http://localhost:8001
 ```
+
+---
+
+## Production Deployment
+
+### 1. Backend (Railway)
+The backend is designed to be deployed on **Railway** (or Render/Heroku) rather than Vercel due to the need for persistent memory (for the live data streaming queue) and websocket/polling support.
+1. Connect your GitHub repository to a new Railway project.
+2. In the Service Settings, set the **Root Directory** to `/backend`.
+3. Railway will automatically detect the `Procfile` and use `uvicorn main:app --host 0.0.0.0 --port $PORT`.
+4. Go to the **Variables** tab for your backend service in Railway and paste all the Backend environment variables. Click **Deploy Changes**.
+
+### 2. Frontend (Vercel)
+1. Import your GitHub repository to Vercel.
+2. Set the **Framework Preset** to Next.js.
+3. Set the **Root Directory** to `frontend`.
+4. Add the Frontend environment variables. **Crucially**, ensure `NEXT_PUBLIC_API_BASE_URL` is set to the full HTTPS URL of your Railway backend (e.g. `https://your-app.up.railway.app`).
+5. Deploy.
 
 ---
 
