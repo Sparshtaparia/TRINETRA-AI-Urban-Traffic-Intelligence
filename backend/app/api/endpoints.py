@@ -204,7 +204,7 @@ Use the actual numbers from the data. Be specific and cite real values."""
     last_err = None
     for key in keys:
         try:
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={key}"
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={key}"
             headers = {"Content-Type": "application/json"}
             payload = {"contents": [{"parts": [{"text": prompt}]}]}
             import requests
@@ -304,7 +304,7 @@ Respond directly to the user's query while strictly adhering to the guardrails a
     import requests
     for key in keys:
         try:
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={key}"
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={key}"
             headers = {"Content-Type": "application/json"}
             
             # Convert history to Gemini format

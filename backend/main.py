@@ -55,6 +55,17 @@ def debug_env():
     keys = {k: "SET" if os.getenv(k) else "MISSING" for k in ["Gemini_API", "GEMINI_API_KEY_1", "GEMINI_API_KEY_2", "GEMINI_API_KEY_3", "MAPMYINDIA_REST_API_KEY"]}
     return {"status": "ok", "env_vars": keys}
 
+@app.get("/api/debug-gemini")
+def debug_gemini():
+    import os, requests
+    key = os.getenv("Gemini_API") or os.getenv("GEMINI_API_KEY_1") or os.getenv("GEMINI_API_KEY_3")
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={key}"
+    try:
+        resp = requests.post(url, headers={"Content-Type": "application/json"}, json={"contents": [{"parts": [{"text": "hi"}]}]})
+        return {"status_code": resp.status_code, "text": resp.text}
+    except Exception as e:
+        return {"error": str(e)}
+
 @app.get("/")
 def root():
     return {"status": "ok"}
