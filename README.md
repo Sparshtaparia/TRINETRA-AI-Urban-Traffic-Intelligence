@@ -430,14 +430,17 @@ The project brings together:
 
 | Metric | Value |
 |--------|-------|
-| Total Analyzed Segments | 14,098 |
-| Average PICQ | 26.61 |
+| Total Raw Records | 298,450 |
+| Total Analyzed Segments | 7,814 |
+| Average Violations / Segment | 38.2 |
+| Average PICQ | 10.05 |
 | Peak PICQ | 100.0 |
-| Q1 Immediate Dispatch | 5,488 |
-| **Q2 Hidden Impact Zones** | **1,562** |
-| Q3 Suppressed Heatmap Zones | 2,173 |
-| Q4 Routine Monitor | 4,875 |
-| RRE > 60 Critical Zones | 4 |
+| Q1 Immediate Dispatch | 2,263 |
+| **Q2 Hidden Impact Zones** | **864** |
+| Q3 Suppressed Heatmap Zones | 896 |
+| Q4 Routine Monitor | 3,791 |
+| RRE ≥ 60 Critical Zones | 5 |
+| Top 10% Recovery Priority | 782 |
 
 ---
 
