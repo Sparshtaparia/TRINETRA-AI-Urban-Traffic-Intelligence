@@ -61,8 +61,12 @@ def debug_gemini():
     key = os.getenv("Gemini_API") or os.getenv("GEMINI_API_KEY_1") or os.getenv("GEMINI_API_KEY_3")
     url = f"https://generativelanguage.googleapis.com/v1beta/models?key={key}"
     try:
-        resp = requests.get(url)
-        return resp.json()
+        resp = requests.get(url).json()
+        models = [m["name"] for m in resp.get("models", [])]
+        while "nextPageToken" in resp:
+            resp = requests.get(url + "&pageToken=" + resp["nextPageToken"]).json()
+            models.extend([m["name"] for m in resp.get("models", [])])
+        return {"gemini_models": [m for m in models if "gemini" in m]}
     except Exception as e:
         return {"error": str(e)}
 
