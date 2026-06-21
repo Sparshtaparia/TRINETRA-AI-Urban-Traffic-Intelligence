@@ -180,7 +180,7 @@ export function OverviewTab() {
     <div className="space-y-8 pb-10">
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="bg-neutral-900 border-neutral-800">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-neutral-400">Records & Segments</CardTitle>
@@ -236,17 +236,6 @@ export function OverviewTab() {
           <CardContent>
             {data ? <><div className="text-3xl font-bold text-orange-400">{data.top_10_recovery_priority_zones?.toLocaleString()}</div><p className="text-xs text-neutral-500 mt-1">RRE ≥ 90th percentile</p></>
                   : <div className="h-9 w-16 bg-neutral-800 rounded animate-pulse" />}
-          </CardContent>
-        </Card>
-
-        <Card className="bg-neutral-900 border-neutral-800">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-neutral-400">Q1 Dispatch Zones</CardTitle>
-            <Zap className="h-4 w-4 text-[#39FF14]" />
-          </CardHeader>
-          <CardContent>
-            {data ? <><div className="text-3xl font-bold text-[#39FF14]">{data.q1_count?.toLocaleString()}</div><p className="text-xs text-neutral-500 mt-1">Immediate tow dispatch</p></>
-                  : <div className="h-9 w-24 bg-neutral-800 rounded animate-pulse" />}
           </CardContent>
         </Card>
       </div>
