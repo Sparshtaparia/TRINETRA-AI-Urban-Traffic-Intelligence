@@ -599,7 +599,6 @@ def ask_live_trinetra(payload: Dict[str, Any] = Body(...)):
         "top_zone": top_zone
     }
 
-    import google.generativeai as genai
     from dotenv import load_dotenv
     import os
 

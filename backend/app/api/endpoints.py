@@ -252,7 +252,6 @@ async def ask_trinetra(req: ChatRequest):
     Secure chat endpoint for TRINETRA AI. 
     Applies strict guardrails to prevent token leakage and out-of-scope interactions.
     """
-    import google.generativeai as genai
     from dotenv import load_dotenv
 
     base_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
