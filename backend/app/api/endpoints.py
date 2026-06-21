@@ -204,7 +204,7 @@ Use the actual numbers from the data. Be specific and cite real values."""
     last_err = None
     for key in keys:
         try:
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={key}"
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={key}"
             headers = {"Content-Type": "application/json"}
             payload = {"contents": [{"parts": [{"text": prompt}]}]}
             import requests
@@ -230,12 +230,16 @@ Use the actual numbers from the data. Be specific and cite real values."""
     try:
         raise last_err
     except Exception as e:
-        # Detailed error message for frontend
+        import re
         error_msg = str(e)
+        if "key=" in error_msg:
+            error_msg = re.sub(r"key=[^&\s]+", "key=REDACTED", error_msg)
         if "API key" in error_msg:
             error_msg = "Invalid Gemini API Key. Please update the .env file."
         elif "404" in error_msg:
             error_msg = "Model version not found or not accessible."
+        elif "429" in error_msg:
+            error_msg = "Rate limit exceeded (429). Please wait a minute or use a different API key."
         return {"status": "failed", "error": error_msg}
 
 class ChatMessage(BaseModel):
@@ -300,7 +304,7 @@ Respond directly to the user's query while strictly adhering to the guardrails a
     import requests
     for key in keys:
         try:
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={key}"
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={key}"
             headers = {"Content-Type": "application/json"}
             
             # Convert history to Gemini format
@@ -327,12 +331,15 @@ Respond directly to the user's query while strictly adhering to the guardrails a
             last_err = e
             continue
 
-    try:
-        raise last_err
-    except Exception as e:
-        error_msg = str(e)
-        if "API key" in error_msg:
-            error_msg = "Invalid Gemini API Key."
-        elif "404" in error_msg:
-            error_msg = "Model version not found or not accessible."
-        return {"status": "failed", "error": error_msg}
+    import re
+    error_msg = str(last_err)
+    if "key=" in error_msg:
+        error_msg = re.sub(r"key=[^&\s]+", "key=REDACTED", error_msg)
+    if "API key" in error_msg:
+        error_msg = "Invalid Gemini API Key."
+    elif "404" in error_msg:
+        error_msg = "Model version not found or not accessible."
+    elif "429" in error_msg:
+        error_msg = "Rate limit exceeded (429). Please wait a minute or add more Gemini API Keys."
+        
+    return {"status": "failed", "error": error_msg}

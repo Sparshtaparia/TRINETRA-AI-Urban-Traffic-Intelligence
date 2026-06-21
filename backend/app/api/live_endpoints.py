@@ -632,7 +632,7 @@ LIVE METRICS CONTEXT:
     last_err = None
     for key in keys:
         try:
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={key}"
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={key}"
             headers = {"Content-Type": "application/json"}
             payload = {
                 "system_instruction": {"parts": [{"text": system_prompt}]},
@@ -653,8 +653,15 @@ LIVE METRICS CONTEXT:
             last_err = e
             continue
 
+    import re
+    error_msg = str(last_err)
+    if "key=" in error_msg:
+        error_msg = re.sub(r"key=[^&\s]+", "key=REDACTED", error_msg)
+    if "429" in error_msg:
+        error_msg = "Rate limit exceeded (429). Please wait a minute or add more Gemini API Keys."
+
     return {
         "status": "ready",
-        "answer": f"Error reaching AI: {str(last_err)}",
+        "answer": f"Error reaching AI: {error_msg}",
         "evidence": evidence
     }
