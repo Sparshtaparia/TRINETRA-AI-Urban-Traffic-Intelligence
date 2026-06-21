@@ -35,6 +35,8 @@ def debug():
         "AWS_REGION": os.getenv("AWS_REGION"),
         "python_path": os.getenv("PYTHONPATH", ""),
         "env_keys": sorted(k for k in os.environ if not k.startswith("npm_")),
+        "figures_dir": os.path.join(os.path.dirname(__file__), "processed", "figures"),
+        "figures_dir_exists": os.path.exists(os.path.join(os.path.dirname(__file__), "processed", "figures")),
     }
 
 @app.get("/api/health")
@@ -56,7 +58,8 @@ try:
     from fastapi.staticfiles import StaticFiles
     figures_dir = os.path.join(os.path.dirname(__file__), "processed", "figures")
     if os.path.exists(figures_dir):
-        app.mount("/api/static/figures", StaticFiles(directory=figures_dir), name="figures")
+        # Mount at /figures/ to avoid conflict with /api/static/* router routes
+        app.mount("/figures", StaticFiles(directory=figures_dir), name="figures")
 
 except Exception:
     _startup_error = traceback.format_exc()

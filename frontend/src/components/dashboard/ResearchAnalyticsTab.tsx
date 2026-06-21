@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { ChevronDown, ChevronUp, ExternalLink } from "lucide-react";
 import { API_BASE } from "../../lib/api";
 
-const BASE = API_BASE + "/api/static/figures";
+const BASE = API_BASE + "/figures";
 
 interface PlotGroup {
   title: string;
