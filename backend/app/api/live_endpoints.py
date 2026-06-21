@@ -17,7 +17,11 @@ from app.api.live_state import (
 
 router = APIRouter()
 
-UPLOADS_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "uploads", "live")
+_is_vercel = os.getenv("VERCEL") == "1" or os.getenv("VERCEL_ENV") is not None
+if _is_vercel:
+    UPLOADS_DIR = "/tmp/uploads/live"
+else:
+    UPLOADS_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "uploads", "live")
 os.makedirs(UPLOADS_DIR, exist_ok=True)
 
 
