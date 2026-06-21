@@ -188,7 +188,7 @@ def validate_csv_source(payload: Dict[str, Any] = Body(...)):
 
     try:
         if file_path.endswith(".parquet"):
-            df = pd.read_parquet(file_path, engine='fastparquet').head(5)
+            df = pd.read_parquet(file_path, engine='pyarrow').head(5)
         elif file_path.endswith(".csv.gz"):
             df = pd.read_csv(file_path, compression='gzip', nrows=5)
         elif file_path.endswith(".csv"):
@@ -240,7 +240,7 @@ def start_csv_replay(payload: Dict[str, Any] = Body(...)):
 
     try:
         if file_path.endswith(".parquet"):
-            df = pd.read_parquet(file_path, engine='fastparquet')
+            df = pd.read_parquet(file_path, engine='pyarrow')
         elif file_path.endswith(".csv.gz"):
             df = pd.read_csv(file_path, compression='gzip')
         elif file_path.endswith(".csv"):
@@ -307,7 +307,7 @@ def start_file_polling(payload: Dict[str, Any] = Body(...)):
 
     try:
         if file_path.endswith(".parquet"):
-            df = pd.read_parquet(file_path, engine='fastparquet')
+            df = pd.read_parquet(file_path, engine='pyarrow')
         elif file_path.endswith(".csv.gz"):
             df = pd.read_csv(file_path, compression='gzip')
         elif file_path.endswith(".csv"):
