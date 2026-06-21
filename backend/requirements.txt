@@ -7,3 +7,6 @@ python-multipart
 python-dotenv
 requests
 pyarrow
+scikit-learn
+matplotlib
+seaborn

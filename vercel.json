@@ -1,25 +1,6 @@
 {
-    "headers": [
-        {
-            "source": "/_/backend/(.*)",
-            "headers": [
-                { "key": "Access-Control-Allow-Origin", "value": "*" },
-                { "key": "Access-Control-Allow-Methods", "value": "GET,POST,PUT,DELETE,OPTIONS" },
-                { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization, Accept" }
-            ]
-        }
-    ],
-    "experimentalServices": {
-        "frontend": {
-            "root": "frontend",
-            "routePrefix": "/",
-            "framework": "nextjs"
-        },
-        "backend": {
-            "root": "backend",
-            "routePrefix": "/_/backend",
-            "builder": "@vercel/python",
-            "entrypoint": "main.py"
-        }
-    }
+    "buildCommand": "cd frontend && npm run build",
+    "outputDirectory": "frontend/.next",
+    "installCommand": "cd frontend && npm install",
+    "framework": "nextjs"
 }

@@ -14,16 +14,11 @@ def health_check():
 
 @router.post("/static/use-flipkart-dataset")
 def use_flipkart_dataset():
-    if os.getenv("VERCEL") == "1":
-        return {"status": "success", "message": "Demo Mode (Vercel): Pre-computed dataset is active. Filesystem is read-only."}
     result = process_flipkart_dataset()
     return result
 
 @router.post("/static/upload-dataset")
 async def upload_dataset(file: UploadFile = File(...)):
-    is_vercel = os.getenv("VERCEL") == "1" or os.getenv("VERCEL_ENV") is not None or os.getenv("AWS_REGION") is not None
-    if is_vercel:
-        return {"status": "success", "message": f"Demo Mode (Vercel): Upload simulated for {file.filename}. Pre-computed dataset will be shown."}
     contents = await file.read()
     result = process_uploaded_file(contents, file.filename)
     return result
@@ -33,9 +28,6 @@ class UrlPayload(BaseModel):
 
 @router.post("/static/upload-dataset-url")
 def upload_dataset_url(payload: UrlPayload):
-    is_vercel = os.getenv("VERCEL") == "1" or os.getenv("VERCEL_ENV") is not None or os.getenv("AWS_REGION") is not None
-    if is_vercel:
-        return {"status": "success", "message": f"Demo Mode (Vercel): URL processing simulated. Pre-computed dataset will be shown."}
     from app.services.url_downloader import download_from_url
     try:
         contents, ext = download_from_url(payload.url)
