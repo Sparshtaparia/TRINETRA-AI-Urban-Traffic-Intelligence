@@ -59,10 +59,10 @@ def debug_env():
 def debug_gemini():
     import os, requests
     key = os.getenv("Gemini_API") or os.getenv("GEMINI_API_KEY_1") or os.getenv("GEMINI_API_KEY_3")
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={key}"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models?key={key}"
     try:
-        resp = requests.post(url, headers={"Content-Type": "application/json"}, json={"contents": [{"parts": [{"text": "hi"}]}]})
-        return {"status_code": resp.status_code, "text": resp.text}
+        resp = requests.get(url)
+        return resp.json()
     except Exception as e:
         return {"error": str(e)}
 
