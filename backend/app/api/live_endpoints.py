@@ -247,6 +247,11 @@ def start_csv_replay(payload: Dict[str, Any] = Body(...)):
             df = pd.read_csv(file_path)
         else:
             df = pd.read_excel(file_path)
+            
+        # Live replay only needs a sample to simulate the stream. 
+        # 300k rows would take 27 hours to replay. Cap at 1000 to prevent OOM / timeouts.
+        if len(df) > 1000:
+            df = df.head(1000)
 
         # Basic EDA: Convert timestamp, sort ascending, fillna
         ts_col = mapping.get("timestamp")
