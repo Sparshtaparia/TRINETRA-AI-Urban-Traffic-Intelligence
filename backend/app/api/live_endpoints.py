@@ -632,7 +632,7 @@ LIVE METRICS CONTEXT:
     last_err = None
     for key in keys:
         try:
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={key}"
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={key}"
             headers = {"Content-Type": "application/json"}
             payload = {
                 "system_instruction": {"parts": [{"text": system_prompt}]},
